@@ -1,4 +1,6 @@
 //sorts out card positions for a new game
+/*For Shingi: This class isn't complete just yet but you can either encapsulate these into singleton pattern somehow 
+or use template pattern on these. Which ever you think is best. */
 public class newGame {
 	
 	//52 unique cards
