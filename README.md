@@ -1,16 +1,9 @@
 # solitare
 OOD Final Project
 
-As of 11/11:
+Changes Uploaded on 11/13
 
-Solitare Classes:
-  Cache, Card, Deck, Deckofcards, newGame, Stack
-  
-GUI Classes:
-  CardManager
-  Main
-  
-Bethany's Bullshitting Classes:
-  Solitare tester - tests solitare classes functionality so far
-  Scratch- scratch paper
-  
+Deleted all classes not used to make program run, add what you want back in.
+It runs and sets the board up correctly.
+
+Now we need to add it so when a card is clicked it can be moved, afterwards we would add the logic for card movement.
