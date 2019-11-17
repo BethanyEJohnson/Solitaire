@@ -12,13 +12,17 @@ import javafx.scene.control.Button;
 import javafx.scene.shape.Rectangle;
 
 public class GameStart extends Application {
+	Pane board = new Pane();
+	Card cardEx = new Card();
+	final int WIDTH = cardEx.WIDTH;
+	final int HEIGHT = cardEx.HEIGHT;
 
 	public static void main(String[] args) {
 		launch();
 	}
 
 	public void start(Stage primaryStage) throws Exception {
-		Pane board = new Pane();
+		board = new Pane();
 		board.setStyle("-fx-background-color: green");
 
 		DeckOfCards dc = new DeckOfCards();
@@ -34,11 +38,8 @@ public class GameStart extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				startGame.setVisible(false);
-				// moveDeck(stacks.deck, board);
 				moveDeck(stacks.deck, board);
 				movePlateau(stacks.plateau, board);
-
-
 			}
 		});
 
@@ -62,8 +63,6 @@ public class GameStart extends Application {
 		for (int i = 0; i < cards.size(); i++) {
 			cards.get(i).setX(20);
 			cards.get(i).setY(25);
-			cards.get(i).setWidth(80);
-			cards.get(i).setHeight(120);
 			cards.get(i).setArcWidth(10);
 			cards.get(i).setArcHeight(10);
 		}
@@ -75,13 +74,11 @@ public class GameStart extends Application {
 		for (int a = 0; a < 7; a++) {
 			board.getChildren().addAll(plateau[a]);
 			for (int i = 0; i < plateau[a].size(); i++) {
-				plateau[a].get(i).setX(20 + 120 * a);
+				plateau[a].get(i).setX(20 + HEIGHT * a);
 				plateau[a].get(i).setY(200 + 20 * i);
-				plateau[a].get(i).setWidth(80);
-				plateau[a].get(i).setHeight(120);
 				plateau[a].get(i).setArcWidth(10);
 				plateau[a].get(i).setArcHeight(10);
-				if(i==plateau[a].size()-1) {
+				if (i == plateau[a].size() - 1) {
 					plateau[a].get(i).attachFace();
 				}
 			}
@@ -94,8 +91,8 @@ public class GameStart extends Application {
 			r[a] = new Rectangle();
 			r[a].setX(380 + 120 * a);
 			r[a].setY(25);
-			r[a].setWidth(80);
-			r[a].setHeight(120);
+			r[a].setWidth(WIDTH);
+			r[a].setHeight(HEIGHT);
 			r[a].setArcWidth(10);
 			r[a].setArcHeight(10);
 			r[a].setFill(Color.GREEN);

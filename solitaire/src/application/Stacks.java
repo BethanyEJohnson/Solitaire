@@ -30,7 +30,11 @@ public class Stacks {
 				plateau[a].add(dc.Cards[increment]);
 				increment++;
 			}
-		for (int a = 28; a < 52; a++)
+		for (int a = 28; a < 52; a++) {
 			deck.add(dc.Cards[a]);
+			//The following two lines make the deck able to be clicked through
+			deck.get(a-28).isDeck=true;
+			deck.get(a-28).attachBack();
+		}
 	}
 }
