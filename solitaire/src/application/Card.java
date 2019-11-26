@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -17,8 +18,8 @@ public class Card extends Rectangle {
 	// boolean value to check if a card is a part of the deck(top left)
 	boolean isDeck;
 	// Coordinates for moving a card, first position in array is x second is y
+	double[] translationOrigin = new double[2];
 	double[] origin = new double[2];
-	double[] destination = new double[2];
 	// Height and width of card
 	final int WIDTH = 80;
 	final int HEIGHT = 120;
@@ -44,9 +45,9 @@ public class Card extends Rectangle {
 		Image c = new Image(card.toURI().toString());
 		ImagePattern i = new ImagePattern(c);
 		this.setFill(i);
-		isFaceUp = true;
-		this.setOnMousePressed(cardMousePressMove);
-		this.setOnMouseDragged(cardMouseDragMove);
+		setOnMousePressed(cardMousePressMove);
+		setOnMouseDragged(cardMouseDragMove);
+		setOnMouseReleased(cardMouseDragRelease);
 	}
 
 	// Change image of card to be gray
@@ -55,10 +56,8 @@ public class Card extends Rectangle {
 		Image c = new Image(card.toURI().toString());
 		ImagePattern i = new ImagePattern(c);
 		this.setFill(i);
-		isFaceUp = false;
-		if (isDeck) {
-			this.setOnMouseReleased(cardMousePressDeck);
-		}
+		if (isDeck)
+			setOnMouseClicked(cardMousePressDeck);
 	}
 
 	// Mouse event for when upper left deck is clicked to reveal next card
@@ -71,29 +70,39 @@ public class Card extends Rectangle {
 		}
 	};
 
-	// The following two events enable a card to be dragged and dropped to desired
-	// location
+	// Get origin and destination of card for the movement
 	EventHandler<MouseEvent> cardMousePressMove = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent t) {
 			toFront();
-			origin[0] = t.getSceneX();
-			origin[1] = t.getSceneY();
-			destination[0] = ((Card) (t.getSource())).getTranslateX();
-			destination[1] = ((Card) (t.getSource())).getTranslateY();
+			translationOrigin[0] = t.getSceneX();
+			translationOrigin[1] = t.getSceneY();
+			origin[0] = ((Card) (t.getSource())).getTranslateX();
+			origin[1] = ((Card) (t.getSource())).getTranslateY();
 		}
 	};
 
+	// Dragging cards around mouseEvent
 	EventHandler<MouseEvent> cardMouseDragMove = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent t) {
-			toFront();
-			double offsetX = t.getSceneX() - origin[0];
-			double offsetY = t.getSceneY() - origin[1];
-			double newTranslateX = destination[0] + offsetX;
-			double newTranslateY = destination[1] + offsetY;
-			((Card) (t.getSource())).setTranslateX(newTranslateX);
-			((Card) (t.getSource())).setTranslateY(newTranslateY);
+			double TranslateX = origin[0] + t.getSceneX() - translationOrigin[0];
+			double TranslateY = origin[1] + t.getSceneY() - translationOrigin[1];
+			((Card) (t.getSource())).setTranslateX(TranslateX);
+			((Card) (t.getSource())).setTranslateY(TranslateY);
+
+		}
+	};
+
+	// The following event checks whether a card can be set at a location
+	// Logic needs to be added here for movement ///////////////////////////////////////// or move this event to different class
+	EventHandler<MouseEvent> cardMouseDragRelease = new EventHandler<MouseEvent>() {
+		@Override
+		public void handle(MouseEvent t) {
+			if (1 == 1) {
+				((Card) (t.getSource())).setTranslateX(origin[0]);
+				((Card) (t.getSource())).setTranslateY(origin[1]);
+			}
 		}
 	};
 }
