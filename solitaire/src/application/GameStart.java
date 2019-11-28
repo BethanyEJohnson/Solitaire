@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 
 public class GameStart extends Application {
@@ -16,6 +17,8 @@ public class GameStart extends Application {
 	Card cardEx = new Card();
 	final int WIDTH = cardEx.WIDTH;
 	final int HEIGHT = cardEx.HEIGHT;
+	DeckOfCards dc;
+	Stacks stacks;
 
 	public static void main(String[] args) {
 		launch();
@@ -25,27 +28,34 @@ public class GameStart extends Application {
 		board = new Pane();
 		board.setStyle("-fx-background-color: green");
 
-		DeckOfCards dc = new DeckOfCards();
-		Stacks stacks = new Stacks(dc);
-
 		// Empty boxes to indicate cache area
 		Rectangle[] boxes = new Rectangle[4];
 		initializeBox(boxes);
 
-		Button startGame = new Button("Start Game");
+		Button newGame = new Button("New Game");
 
-		startGame.setOnAction(new EventHandler<ActionEvent>() {
+		// Button to start game
+		newGame.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				startGame.setVisible(false);
+				newGame.setVisible(true);
+				board.getChildren().clear();
+				board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], newGame);
+				// Make a deck of cards and the stacks
+				dc = DeckOfCards.getInstance();
+				dc.getCards();
+				dc.shuffle();
+				stacks = new Stacks(dc);
+				// Set up cards on the board
 				moveDeck(stacks.deck, board);
 				movePlateau(stacks.plateau, board);
+				System.out.println(stacks.plateau[0].getLast().rank);
 			}
 		});
 
 		// add to container
-		board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], startGame);
-
+		board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], newGame);
+		
 		// create scene
 		Scene mainScene = new Scene(board, 840, 900);
 
@@ -55,6 +65,13 @@ public class GameStart extends Application {
 
 		// show the stage
 		primaryStage.show();
+	}
+	
+	public boolean cardIsNear(Card c) {
+		if(1 == 1) {
+			c.isNear=true;
+		}
+		return c.isNear;
 	}
 
 	// put deck in correct spot

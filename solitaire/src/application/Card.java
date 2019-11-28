@@ -23,8 +23,11 @@ public class Card extends Rectangle {
 	// Height and width of card
 	final int WIDTH = 80;
 	final int HEIGHT = 120;
+	// If this card is near another card (For mouse event)
+	boolean isNear = false;
+	double TranslateX,TranslateY;
 
-	// No arg constructor to get example Card
+	// No argument constructor to get example Card
 	public Card() {
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
@@ -90,18 +93,21 @@ public class Card extends Rectangle {
 			double TranslateY = origin[1] + t.getSceneY() - translationOrigin[1];
 			((Card) (t.getSource())).setTranslateX(TranslateX);
 			((Card) (t.getSource())).setTranslateY(TranslateY);
-
 		}
 	};
-
+	
 	// The following event checks whether a card can be set at a location
 	// Logic needs to be added here for movement ///////////////////////////////////////// or move this event to different class
 	EventHandler<MouseEvent> cardMouseDragRelease = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent t) {
-			if (1 == 1) {
+			if (isNear == false) {
 				((Card) (t.getSource())).setTranslateX(origin[0]);
 				((Card) (t.getSource())).setTranslateY(origin[1]);
+			}
+			else {
+				((Card) (t.getSource())).setTranslateX(TranslateX);
+				((Card) (t.getSource())).setTranslateY(TranslateY);
 			}
 		}
 	};
