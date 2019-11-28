@@ -25,7 +25,7 @@ DeckOfCards (Singelton), you can click on space deck is initially in to flip dec
 
 Task List:
 
-- Fix Deck cycle, when deck is flipped back over it start from bottom card
-- Add logic to make cards stay when move
+- Fix Deck cycle, when deck is flipped back over it starts from bottom card
+- Add logic to make cards stay when moved
 - Add logic to stack cards in cache
 - Implement design patterns
