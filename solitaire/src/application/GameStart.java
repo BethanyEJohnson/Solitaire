@@ -1,5 +1,6 @@
 package application;
 
+import java.lang.Math;
 import java.util.LinkedList;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -120,28 +121,27 @@ public class GameStart extends Application {
 					c.TranslateY = c.origin[1] + t.getSceneY() - c.translationOrigin[1];
 					((Card) (t.getSource())).setTranslateX(c.TranslateX);
 					((Card) (t.getSource())).setTranslateY(c.TranslateY);
+					c.center[0] = t.getSceneX();
+					c.center[1] = t.getSceneY();
 				}
 			}
 		});
 	}
 
+	// Checks for collision of cards
 	private boolean checkBounds(Card c) {
 		boolean collisionDetected = false;
 		for (Card card : dc.Cards) {
-			if (card != c) {
-				if (c.getBoundsInParent().intersects(card.getBoundsInParent())) {
+			if (card != c && card.isFaceUp && !card.isDeck) {
+				if (c.getBoundsInParent().intersects(card.getBoundsInParent())
+						&& Math.abs(c.center[0] - card.getX() - 40) < 40
+						&& Math.abs(c.center[1] - card.getY() - 60) < 40) {
 					collisionDetected = true;
 				}
 			}
 		}
+		System.out.println("");
 		return collisionDetected;
-	}
-
-	public boolean cardIsNear(Card c) {
-		if (1 == 1) {
-			c.isNear = true;
-		}
-		return c.isNear;
 	}
 
 	// add cards stacks entities to board
@@ -171,10 +171,10 @@ public class GameStart extends Application {
 				plateau[a].get(i).setY(200 + 20 * i);
 				plateau[a].get(i).setArcWidth(10);
 				plateau[a].get(i).setArcHeight(10);
-				if (i == plateau[a].size() - 1) {
+				if (i == plateau[a].size() - 1)
 					plateau[a].get(i).attachFace();
-				}
 				addEvent(plateau[a].get(i));
+
 			}
 		}
 	}
@@ -192,6 +192,7 @@ public class GameStart extends Application {
 			r[a].setFill(Color.GREEN);
 			r[a].setStroke(Color.WHITESMOKE);
 		}
+		// White box pos for deck
 		r[4].setX(20);
 		r[4].setY(25);
 	}

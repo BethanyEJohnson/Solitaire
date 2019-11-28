@@ -7,8 +7,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 public class Card extends Rectangle {
-	// because card extends rectangle, getX and getY return the top left position of
-	// the card
 	String suit;
 	String rank;
 	// boolean value to determine if card is face up
@@ -24,7 +22,7 @@ public class Card extends Rectangle {
 	// If this card is near another card (For mouse event)
 	boolean isNear;
 	double TranslateX,TranslateY;
-	// Coordinate for center of card, first position in array is x second is y
+	// Coordinate for part of card mouse is clicked on, first position in array is x second is y
 	double[] center = new double[2];
 
 	// No argument constructor to get example Card
@@ -58,11 +56,5 @@ public class Card extends Rectangle {
 		ImagePattern i = new ImagePattern(c);
 		this.setFill(i);
 		isFaceUp = false;
-	}
-	
-	//Figures out center position of card
-	public void getCenter() {
-		center[0] = this.getX()+40;
-		center[1] = this.getY()+60;
 	}
 }
