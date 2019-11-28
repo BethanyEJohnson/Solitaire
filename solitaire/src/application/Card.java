@@ -48,9 +48,7 @@ public class Card extends Rectangle {
 		Image c = new Image(card.toURI().toString());
 		ImagePattern i = new ImagePattern(c);
 		this.setFill(i);
-		setOnMousePressed(cardMousePressMove);
-		setOnMouseDragged(cardMouseDragMove);
-		setOnMouseReleased(cardMouseDragRelease);
+		isFaceUp = true;
 	}
 
 	// Change image of card to be gray
@@ -59,56 +57,6 @@ public class Card extends Rectangle {
 		Image c = new Image(card.toURI().toString());
 		ImagePattern i = new ImagePattern(c);
 		this.setFill(i);
-		if (isDeck)
-			setOnMouseClicked(cardMousePressDeck);
+		isFaceUp = false;
 	}
-
-	// Mouse event for when upper left deck is clicked to reveal next card
-	EventHandler<MouseEvent> cardMousePressDeck = new EventHandler<MouseEvent>() {
-		@Override
-		public void handle(MouseEvent t) {
-			toFront();
-			setX(HEIGHT + 20);
-			attachFace();
-		}
-	};
-
-	// Get origin and destination of card for the movement
-	EventHandler<MouseEvent> cardMousePressMove = new EventHandler<MouseEvent>() {
-		@Override
-		public void handle(MouseEvent t) {
-			toFront();
-			translationOrigin[0] = t.getSceneX();
-			translationOrigin[1] = t.getSceneY();
-			origin[0] = ((Card) (t.getSource())).getTranslateX();
-			origin[1] = ((Card) (t.getSource())).getTranslateY();
-		}
-	};
-
-	// Dragging cards around mouseEvent
-	EventHandler<MouseEvent> cardMouseDragMove = new EventHandler<MouseEvent>() {
-		@Override
-		public void handle(MouseEvent t) {
-			double TranslateX = origin[0] + t.getSceneX() - translationOrigin[0];
-			double TranslateY = origin[1] + t.getSceneY() - translationOrigin[1];
-			((Card) (t.getSource())).setTranslateX(TranslateX);
-			((Card) (t.getSource())).setTranslateY(TranslateY);
-		}
-	};
-	
-	// The following event checks whether a card can be set at a location
-	// Logic needs to be added here for movement ///////////////////////////////////////// or move this event to different class
-	EventHandler<MouseEvent> cardMouseDragRelease = new EventHandler<MouseEvent>() {
-		@Override
-		public void handle(MouseEvent t) {
-			if (isNear == false) {
-				((Card) (t.getSource())).setTranslateX(origin[0]);
-				((Card) (t.getSource())).setTranslateY(origin[1]);
-			}
-			else {
-				((Card) (t.getSource())).setTranslateX(TranslateX);
-				((Card) (t.getSource())).setTranslateY(TranslateY);
-			}
-		}
-	};
 }

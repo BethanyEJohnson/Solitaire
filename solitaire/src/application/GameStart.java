@@ -45,7 +45,6 @@ public class GameStart extends Application {
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
 				dc.getCards();
-				dc.shuffle();
 				stacks = new Stacks(dc);
 				// Set up cards on the board
 				addStacks(stacks);
@@ -66,6 +65,66 @@ public class GameStart extends Application {
 
 		// show the stage
 		primaryStage.show();
+	}
+
+	// Add ability for cards to be clicked
+	public void addEvent(Card c) {
+		// Logic for moving cards around
+		c.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent t) {
+				if (c.isFaceUp) {
+					System.out.println(c.isFaceUp);
+					if (c.isNear == true) {
+						((Card) (t.getSource())).setTranslateX(c.origin[0]);
+						((Card) (t.getSource())).setTranslateY(c.origin[1]);
+					} else {
+						((Card) (t.getSource())).setTranslateX(c.TranslateX);
+						((Card) (t.getSource())).setTranslateY(c.TranslateY);
+					}
+				}
+			}
+		});
+
+		// Mouse event for when upper left deck is clicked to reveal next card
+		c.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent t) {
+				if (c.isDeck) {
+					c.toFront();
+					c.setX(HEIGHT + 20);
+					c.attachFace();
+				}
+			}
+		});
+
+		// Get origin and destination of card for the movement
+		c.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent t) {
+				if (c.isFaceUp) {
+					c.toFront();
+					c.translationOrigin[0] = t.getSceneX();
+					c.translationOrigin[1] = t.getSceneY();
+					c.origin[0] = ((Card) (t.getSource())).getTranslateX();
+					c.origin[1] = ((Card) (t.getSource())).getTranslateY();
+				}
+			}
+		});
+
+		// Dragging cards around mouseEvent
+		c.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent t) {
+				if (c.isFaceUp) {
+					double TranslateX = c.origin[0] + t.getSceneX() - c.translationOrigin[0];
+					double TranslateY = c.origin[1] + t.getSceneY() - c.translationOrigin[1];
+					((Card) (t.getSource())).setTranslateX(TranslateX);
+					((Card) (t.getSource())).setTranslateY(TranslateY);
+				}
+			}
+		});
+
 	}
 
 	public boolean cardIsNear(Card c) {
@@ -90,6 +149,7 @@ public class GameStart extends Application {
 			cards.get(i).setY(25);
 			cards.get(i).setArcWidth(10);
 			cards.get(i).setArcHeight(10);
+			addEvent(cards.get(i));
 		}
 	}
 
@@ -104,6 +164,7 @@ public class GameStart extends Application {
 				if (i == plateau[a].size() - 1) {
 					plateau[a].get(i).attachFace();
 				}
+				addEvent(plateau[a].get(i));
 			}
 		}
 	}
@@ -125,8 +186,8 @@ public class GameStart extends Application {
 		r[4].setY(25);
 	}
 
-	// Mouse event for putting deck back over, when you click on location deck is at
-	// after all cards are cycled through
+	// Mouse event for putting deck back in original location, after being
+	// cycled through
 	EventHandler<MouseEvent> flipDeck = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent t) {

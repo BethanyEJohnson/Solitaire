@@ -35,9 +35,7 @@ public class Stacks {
 			}
 		// Adds 24 cards to the deck
 		for (int a = 28; a < 52; a++) {
-			// The following two lines allow the deck to be cycled through
 			dc.Cards[a].isDeck=true;
-			dc.Cards[a].attachBack();
 			deck.add(dc.Cards[a]);
 		}
 	}
