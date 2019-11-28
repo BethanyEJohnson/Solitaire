@@ -41,6 +41,7 @@ public class GameStart extends Application {
 				newGame.setVisible(true);
 				board.getChildren().clear();
 				board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], newGame);
+				boxes[4].setOnMouseClicked(flipDeck);
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
 				dc.getCards();
@@ -50,7 +51,6 @@ public class GameStart extends Application {
 				addStacks(stacks);
 				moveDeck(stacks.deck);
 				movePlateau(stacks.plateau);
-				System.out.println(stacks.plateau[0].getLast().rank);
 			}
 		});
 
@@ -90,9 +90,7 @@ public class GameStart extends Application {
 			cards.get(i).setY(25);
 			cards.get(i).setArcWidth(10);
 			cards.get(i).setArcHeight(10);
-			System.out.println(cards.get(i).rank);
 		}
-		System.out.println();
 	}
 
 	// Set up plateau
@@ -125,7 +123,6 @@ public class GameStart extends Application {
 		}
 		r[4].setX(20);
 		r[4].setY(25);
-		r[4].setOnMouseClicked(flipDeck);
 	}
 
 	// Mouse event for putting deck back over, when you click on location deck is at
