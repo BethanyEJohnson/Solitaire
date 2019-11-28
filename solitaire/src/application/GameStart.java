@@ -74,13 +74,12 @@ public class GameStart extends Application {
 			@Override
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
-					System.out.println(c.isFaceUp);
-					if (c.isNear == true) {
-						((Card) (t.getSource())).setTranslateX(c.origin[0]);
-						((Card) (t.getSource())).setTranslateY(c.origin[1]);
-					} else {
+					if (c.isNear == false) {
 						((Card) (t.getSource())).setTranslateX(c.TranslateX);
 						((Card) (t.getSource())).setTranslateY(c.TranslateY);
+					} else {
+						((Card) (t.getSource())).setTranslateX(c.origin[0]);
+						((Card) (t.getSource())).setTranslateY(c.origin[1]);
 					}
 				}
 			}
@@ -98,7 +97,7 @@ public class GameStart extends Application {
 			}
 		});
 
-		// Get origin and destination of card for the movement
+		// Get origin and logic for movement of card
 		c.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent t) {
@@ -117,10 +116,10 @@ public class GameStart extends Application {
 			@Override
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
-					double TranslateX = c.origin[0] + t.getSceneX() - c.translationOrigin[0];
-					double TranslateY = c.origin[1] + t.getSceneY() - c.translationOrigin[1];
-					((Card) (t.getSource())).setTranslateX(TranslateX);
-					((Card) (t.getSource())).setTranslateY(TranslateY);
+					c.TranslateX = c.origin[0] + t.getSceneX() - c.translationOrigin[0];
+					c.TranslateY = c.origin[1] + t.getSceneY() - c.translationOrigin[1];
+					((Card) (t.getSource())).setTranslateX(c.TranslateX);
+					((Card) (t.getSource())).setTranslateY(c.TranslateY);
 				}
 			}
 		});

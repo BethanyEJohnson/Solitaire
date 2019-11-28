@@ -2,9 +2,7 @@ package application;
 
 import java.io.File;
 
-import javafx.event.EventHandler;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
@@ -24,8 +22,10 @@ public class Card extends Rectangle {
 	final int WIDTH = 80;
 	final int HEIGHT = 120;
 	// If this card is near another card (For mouse event)
-	boolean isNear = false;
+	boolean isNear;
 	double TranslateX,TranslateY;
+	// Coordinate for center of card, first position in array is x second is y
+	double[] center = new double[2];
 
 	// No argument constructor to get example Card
 	public Card() {
@@ -58,5 +58,11 @@ public class Card extends Rectangle {
 		ImagePattern i = new ImagePattern(c);
 		this.setFill(i);
 		isFaceUp = false;
+	}
+	
+	//Figures out center position of card
+	public void getCenter() {
+		center[0] = this.getX()+40;
+		center[1] = this.getY()+60;
 	}
 }
