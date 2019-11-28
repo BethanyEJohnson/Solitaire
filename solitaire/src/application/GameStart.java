@@ -74,7 +74,7 @@ public class GameStart extends Application {
 			@Override
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
-					if (c.isNear == false) {
+					if (checkBounds(c)) {
 						((Card) (t.getSource())).setTranslateX(c.TranslateX);
 						((Card) (t.getSource())).setTranslateY(c.TranslateY);
 					} else {
@@ -123,7 +123,18 @@ public class GameStart extends Application {
 				}
 			}
 		});
+	}
 
+	private boolean checkBounds(Card c) {
+		boolean collisionDetected = false;
+		for (Card card : dc.Cards) {
+			if (card != c) {
+				if (c.getBoundsInParent().intersects(card.getBoundsInParent())) {
+					collisionDetected = true;
+				}
+			}
+		}
+		return collisionDetected;
 	}
 
 	public boolean cardIsNear(Card c) {
