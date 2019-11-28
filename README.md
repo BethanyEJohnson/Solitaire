@@ -24,7 +24,7 @@ Changes Uploaded on 11/28:
 DeckOfCards (Singelton), you can click on space deck is initially in to flip deck back over when you cycle through it
 Task List:
 
--Fix Deck cycle, when deck is flipped back over it start from bottom card
--Add logic to make cards stay when move
--Add logic to stack cards in cache
--Implement design patterns
+- Fix Deck cycle, when deck is flipped back over it start from bottom card
+- Add logic to make cards stay when move
+- Add logic to stack cards in cache
+- Implement design patterns
