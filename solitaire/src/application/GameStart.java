@@ -29,7 +29,7 @@ public class GameStart extends Application {
 		board.setStyle("-fx-background-color: green");
 
 		// Empty boxes to indicate cache area
-		Rectangle[] boxes = new Rectangle[4];
+		Rectangle[] boxes = new Rectangle[5];
 		initializeBox(boxes);
 
 		Button newGame = new Button("New Game");
@@ -40,22 +40,23 @@ public class GameStart extends Application {
 			public void handle(ActionEvent event) {
 				newGame.setVisible(true);
 				board.getChildren().clear();
-				board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], newGame);
+				board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], newGame);
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
 				dc.getCards();
 				dc.shuffle();
 				stacks = new Stacks(dc);
 				// Set up cards on the board
-				moveDeck(stacks.deck, board);
-				movePlateau(stacks.plateau, board);
+				addStacks(stacks);
+				moveDeck(stacks.deck);
+				movePlateau(stacks.plateau);
 				System.out.println(stacks.plateau[0].getLast().rank);
 			}
 		});
 
 		// add to container
-		board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], newGame);
-		
+		board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], newGame);
+
 		// create scene
 		Scene mainScene = new Scene(board, 840, 900);
 
@@ -66,30 +67,37 @@ public class GameStart extends Application {
 		// show the stage
 		primaryStage.show();
 	}
-	
+
 	public boolean cardIsNear(Card c) {
-		if(1 == 1) {
-			c.isNear=true;
+		if (1 == 1) {
+			c.isNear = true;
 		}
 		return c.isNear;
 	}
 
+	// add cards stacks entities to board
+	public void addStacks(Stacks s) {
+		board.getChildren().addAll(stacks.deck);
+		for (int a = 0; a < 7; a++)
+			board.getChildren().addAll(stacks.plateau[a]);
+	}
+
 	// put deck in correct spot
-	public boolean moveDeck(LinkedList<Card> cards, Pane board) {
-		board.getChildren().addAll(cards);
+	public void moveDeck(LinkedList<Card> cards) {
 		for (int i = 0; i < cards.size(); i++) {
+			cards.get(i).attachBack();
 			cards.get(i).setX(20);
 			cards.get(i).setY(25);
 			cards.get(i).setArcWidth(10);
 			cards.get(i).setArcHeight(10);
+			System.out.println(cards.get(i).rank);
 		}
-		return true;
+		System.out.println();
 	}
 
 	// Set up plateau
-	public void movePlateau(LinkedList<Card>[] plateau, Pane board) {
+	public void movePlateau(LinkedList<Card>[] plateau) {
 		for (int a = 0; a < 7; a++) {
-			board.getChildren().addAll(plateau[a]);
 			for (int i = 0; i < plateau[a].size(); i++) {
 				plateau[a].get(i).setX(20 + HEIGHT * a);
 				plateau[a].get(i).setY(200 + 20 * i);
@@ -104,7 +112,7 @@ public class GameStart extends Application {
 
 	// Initialize cache area empty white boxes
 	public void initializeBox(Rectangle[] r) {
-		for (int a = 0; a < 4; a++) {
+		for (int a = 0; a < 5; a++) {
 			r[a] = new Rectangle();
 			r[a].setX(380 + 120 * a);
 			r[a].setY(25);
@@ -115,5 +123,17 @@ public class GameStart extends Application {
 			r[a].setFill(Color.GREEN);
 			r[a].setStroke(Color.WHITESMOKE);
 		}
+		r[4].setX(20);
+		r[4].setY(25);
+		r[4].setOnMouseClicked(flipDeck);
 	}
+
+	// Mouse event for putting deck back over, when you click on location deck is at
+	// after all cards are cycled through
+	EventHandler<MouseEvent> flipDeck = new EventHandler<MouseEvent>() {
+		@Override
+		public void handle(MouseEvent t) {
+			moveDeck(stacks.deck);
+		}
+	};
 }
