@@ -21,7 +21,7 @@ Card now will snap back to original position, logic needs to be added to look fo
 
 Changes Uploaded on 11/28:
 
-DeckOfCards (Singelton), you can click on space deck is initially in to flip deck back over when you cycle through it, collision is now being detected for cards, cards can now be moved around.
+DeckOfCards (Singelton), you can click on space deck is initially in to flip deck back over when you cycle through it, collision is now being detected for cards, single cards can now be moved around between the stacks.
 
 Task List:
 
