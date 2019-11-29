@@ -27,7 +27,7 @@ Task List:
 
 - Fix Deck cycle, when deck is flipped back over it starts from bottom card
 - Add logic to make previous card flip over when the card on the bottom of stack is moved
-- Add logic to make cards fix in place after being movement
+- Add logic to make cards fix in place after being moved
 - Add logic to be able to move multiple cards (when they are stacked on top of each other)
 - Add logic to stack cards in cache
 - Implement design patterns
