@@ -70,22 +70,6 @@ public class GameStart extends Application {
 
 	// Add ability for cards to be clicked
 	public void addEvent(Card c) {
-		// Logic for moving cards around
-		c.setOnMouseReleased(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent t) {
-				if (c.isFaceUp) {
-					if (checkBounds(c)) {
-						((Card) (t.getSource())).setTranslateX(c.TranslateX);
-						((Card) (t.getSource())).setTranslateY(c.TranslateY);
-					} else {
-						((Card) (t.getSource())).setTranslateX(c.origin[0]);
-						((Card) (t.getSource())).setTranslateY(c.origin[1]);
-					}
-				}
-			}
-		});
-
 		// Mouse event for when upper left deck is clicked to reveal next card
 		c.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
@@ -126,22 +110,83 @@ public class GameStart extends Application {
 				}
 			}
 		});
+
+		// Logic for moving cards around
+		c.setOnMouseReleased(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent t) {
+				if (c.isFaceUp) {
+					if (checkBounds(c)) {
+						((Card) (t.getSource())).setTranslateX(c.TranslateX);
+						((Card) (t.getSource())).setTranslateY(c.TranslateY);
+					} else {
+						((Card) (t.getSource())).setTranslateX(c.origin[0]);
+						((Card) (t.getSource())).setTranslateY(c.origin[1]);
+					}
+				}
+			}
+		});
 	}
 
 	// Checks for collision of cards
-	private boolean checkBounds(Card c) {
+	public boolean checkBounds(Card c) {
 		boolean collisionDetected = false;
 		for (Card card : dc.Cards) {
 			if (card != c && card.isFaceUp && !card.isDeck) {
-				if (c.getBoundsInParent().intersects(card.getBoundsInParent())
-						&& Math.abs(c.center[0] - card.getX() - 40) < 40
-						&& Math.abs(c.center[1] - card.getY() - 60) < 40) {
-					collisionDetected = true;
+				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)) {
+					if (checkCard(c, card) && checkSuit(c, card))
+						collisionDetected = true;
 				}
 			}
 		}
 		System.out.println("");
 		return collisionDetected;
+	}
+
+	public boolean distanceCheck(Card c, Card card) {
+		if (Math.abs(c.center[0] - card.getX() - 40) < 40 && Math.abs(c.center[1] - card.getY() - 60) < 40)
+			return true;
+		return false;
+	}
+
+	// Comparison to see if above card is the right rank for movement
+	public boolean checkCard(Card orig, Card top) {
+		if (orig.rank == "A" && top.rank == "2")
+			return true;
+		if (orig.rank == "2" && top.rank == "3")
+			return true;
+		if (orig.rank == "3" && top.rank == "4")
+			return true;
+		if (orig.rank == "4" && top.rank == "5")
+			return true;
+		if (orig.rank == "5" && top.rank == "6")
+			return true;
+		if (orig.rank == "6" && top.rank == "7")
+			return true;
+		if (orig.rank == "7" && top.rank == "8")
+			return true;
+		if (orig.rank == "8" && top.rank == "9")
+			return true;
+		if (orig.rank == "9" && top.rank == "10")
+			return true;
+		if (orig.rank == "10" && top.rank == "J")
+			return true;
+		if (orig.rank == "J" && top.rank == "Q")
+			return true;
+		if (orig.rank == "Q" && top.rank == "K")
+			return true;
+		if (orig.rank == "K" && top.rank == null)
+			return true;
+		return false;
+	}
+
+	// Comparison to see if above card is the right suit for movement
+	public boolean checkSuit(Card orig, Card top) {
+		if ((orig.suit == "H" || orig.suit == "D") && (top.suit == "S" || top.suit == "C"))
+			return true;
+		if ((orig.suit == "S" || orig.suit == "C") && (top.suit == "H" || top.suit == "D"))
+			return true;
+		return false;
 	}
 
 	// add cards stacks entities to board
@@ -165,7 +210,7 @@ public class GameStart extends Application {
 
 	// Set up plateau
 	public void movePlateau(LinkedList<Card>[] plateau) {
-		for (int a = 0; a < 7; a++) {
+		for (int a = 0; a < plateau.length; a++) {
 			for (int i = 0; i < plateau[a].size(); i++) {
 				plateau[a].get(i).setX(20 + HEIGHT * a);
 				plateau[a].get(i).setY(200 + 20 * i);
