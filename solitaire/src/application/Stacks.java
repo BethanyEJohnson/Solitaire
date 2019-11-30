@@ -1,17 +1,21 @@
 package application;
+
 import java.util.*;
 
 public class Stacks {
 
 	// Each stack is made as a LinkedList
-	LinkedList<Card> cache = new LinkedList<Card>();
+	LinkedList<Card>[] cache;
 	LinkedList<Card>[] plateau;
 	LinkedList<Card> deck = new LinkedList<Card>();
 	LinkedList<Card> temp = new LinkedList<Card>();
 
+	// Place holders for cache
+
 	// Constructor takes a deck of cards to configure all the stacks
 	public Stacks(DeckOfCards dc) {
 		iniPlateau();
+		iniCache();
 		addCardToStacks(dc);
 	}
 
@@ -24,10 +28,23 @@ public class Stacks {
 		}
 	}
 
+	// Initialize Cache
+	@SuppressWarnings("unchecked")
+	public void iniCache() {
+		cache = new LinkedList[4];
+		for (int a = 0; a < 4; a++) {
+			cache[a] = new LinkedList<Card>();
+			Card placeHolder = new Card();
+			placeHolder.isCache = true;
+			cache[a].add(placeHolder);
+		}
+	}
+
 	// Adds cards to all the different stacks
 	public void addCardToStacks(DeckOfCards dc) {
 		int increment = 0;
-		// Add the correct amount of cards to each of the stacks that make up the plateau
+		// Add the correct amount of cards to each of the stacks that make up the
+		// plateau
 		for (int a = 0; a < 7; a++)
 			for (int b = 0; b <= a; b++) {
 				plateau[a].add(dc.Cards[increment]);
@@ -35,7 +52,7 @@ public class Stacks {
 			}
 		// Adds 24 cards to the deck
 		for (int a = 28; a < 52; a++) {
-			dc.Cards[a].isDeck=true;
+			dc.Cards[a].isDeck = true;
 			deck.add(dc.Cards[a]);
 		}
 	}

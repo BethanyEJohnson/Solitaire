@@ -200,6 +200,7 @@ public class GameStart extends Application {
 					j++;
 					int a = 0;
 					while (j < stacks.plateau[i].size()) {
+						c.hasChildren = true;
 						children[a] = stacks.plateau[i].get(j);
 						a++;
 						j++;
@@ -247,11 +248,12 @@ public class GameStart extends Application {
 					removeCard(c);
 					moveToNewStack(card, c);
 					int a = 0;
-					while (a < cardChildren.length && cardChildren[a] != null) {
-						removeCard(cardChildren[a]);
-						moveToNewStack(c, cardChildren[a]);
-						a++;
-					}
+					if (c.hasChildren)
+						while (a < cardChildren.length && cardChildren[a] != null) {
+							removeCard(cardChildren[a]);
+							moveToNewStack(c, cardChildren[a]);
+							a++;
+						}
 					// }
 				}
 		return collisionDetected;

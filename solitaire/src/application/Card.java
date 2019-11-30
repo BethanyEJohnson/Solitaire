@@ -13,6 +13,10 @@ public class Card extends Rectangle {
 	boolean isFaceUp;
 	// boolean value to check if a card is a part of the deck(top left)
 	boolean isDeck;
+	// boolean value to check if a area is cache area
+	boolean isCache;
+	// boolean value of whether card has children(card underneath it)
+	boolean hasChildren;
 	// Coordinates for moving a card, first position in array is x second is y
 	double[] translationOrigin = new double[2];
 	double[] origin = new double[2];
