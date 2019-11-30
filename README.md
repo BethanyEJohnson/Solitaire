@@ -25,11 +25,11 @@ DeckOfCards (Singelton), you can click on space deck is initially in to flip dec
 
 Changes Uploaded on 11/30
 
-Cards now will fix themselves correctly when moved.
+Cards now will fix themselves correctly when moved. Card will now move any cards beneath it in main stacks
 
 Task List:
 
 - Fix Deck cycle, when deck is flipped back over it starts from bottom card
-- Add logic to be able to move multiple cards (when they are stacked on top of each other)
 - Add logic to stack cards in cache
+- Add logic for kings to be able to be moved to empty Spots in Plateau
 - Implement design patterns
