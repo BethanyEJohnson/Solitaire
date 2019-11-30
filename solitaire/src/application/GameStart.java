@@ -1,7 +1,7 @@
 package application;
 
+import javafx.geometry.Point2D;
 import java.lang.Math;
-import java.util.LinkedList;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,13 +25,13 @@ public class GameStart extends Application {
 		launch();
 	}
 
-	// Game logic
+	// Setup Game
 	public void start(Stage primaryStage) throws Exception {
 		board = new Pane();
 		board.setStyle("-fx-background-color: green");
 
 		// Empty boxes to indicate cache area
-		Rectangle[] boxes = new Rectangle[5];
+		Rectangle[] boxes = new Rectangle[12];
 		initializeBox(boxes);
 
 		Button newGame = new Button("New Game");
@@ -42,7 +42,8 @@ public class GameStart extends Application {
 			public void handle(ActionEvent event) {
 				newGame.setVisible(true);
 				board.getChildren().clear();
-				board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], newGame);
+				addBox(boxes);
+				board.getChildren().addAll(newGame);
 				boxes[4].setOnMouseClicked(flipDeck);
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
@@ -56,7 +57,8 @@ public class GameStart extends Application {
 		});
 
 		// add to container
-		board.getChildren().addAll(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], newGame);
+		addBox(boxes);
+		board.getChildren().addAll(newGame);
 
 		// create scene
 		Scene mainScene = new Scene(board, 840, 900);
@@ -93,8 +95,16 @@ public class GameStart extends Application {
 					c.translationOrigin[1] = t.getSceneY();
 					c.origin[0] = ((Card) (t.getSource())).getTranslateX();
 					c.origin[1] = ((Card) (t.getSource())).getTranslateY();
-					// System.out.println(c.getX());
-					// System.out.println(stacks.plateau[0].get(0).getX());
+					Card[] cardChildren = cardChildren(c);
+					int a = 0;
+					while (a < cardChildren.length && cardChildren[a] != null) {
+						cardChildren[a].toFront();
+						cardChildren[a].translationOrigin[0] = c.translationOrigin[0];
+						cardChildren[a].translationOrigin[0] = c.translationOrigin[1] ;
+						cardChildren[a].origin[0] = c.origin[0];
+						cardChildren[a].origin[1] = c.origin[1];
+						a++;
+					}
 				}
 			}
 		});
@@ -104,12 +114,19 @@ public class GameStart extends Application {
 			@Override
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
-					c.TranslateX = c.origin[0] + t.getSceneX() - c.translationOrigin[0];
-					c.TranslateY = c.origin[1] + t.getSceneY() - c.translationOrigin[1];
-					((Card) (t.getSource())).setTranslateX(c.TranslateX);
-					((Card) (t.getSource())).setTranslateY(c.TranslateY);
+					((Card) (t.getSource())).setTranslateX(c.origin[0] + t.getSceneX() - c.translationOrigin[0]);
+					((Card) (t.getSource())).setTranslateY(c.origin[1] + t.getSceneY() - c.translationOrigin[1]);
 					c.center[0] = t.getSceneX();
 					c.center[1] = t.getSceneY();
+					Card[] cardChildren = cardChildren(c);
+					int a = 0;
+					while (a < cardChildren.length && cardChildren[a] != null) {
+						Point2D p = new Point2D(((Card) (t.getSource())).getTranslateX(),
+								((Card) (t.getSource())).getTranslateY());
+						cardChildren[a].setTranslateX(p.getX());
+						cardChildren[a].setTranslateY(p.getY());
+						a++;
+					}
 				}
 			}
 		});
@@ -119,18 +136,52 @@ public class GameStart extends Application {
 			@Override
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
-					if (checkBounds(c)) {
+					Card[] cardChildren = cardChildren(c);
+					int a = 0;
+					// Move cards to new position
+					if (checkBounds(c, cardChildren)) {
 						((Card) (t.getSource())).setTranslateX(c.origin[0]);
 						((Card) (t.getSource())).setTranslateY(c.origin[1]);
+						while (a < cardChildren.length && cardChildren[a] != null) {
+							cardChildren[a].setTranslateX(cardChildren[a].origin[0]);
+							cardChildren[a].setTranslateY(cardChildren[a].origin[1]);
+							a++;
+						}
 						resetPlateau();
-					} else {
+					}
+					// Move cards to original position
+					else {
 						((Card) (t.getSource())).setTranslateX(c.origin[0]);
 						((Card) (t.getSource())).setTranslateY(c.origin[1]);
+						while (a < cardChildren.length && cardChildren[a] != null) {
+							cardChildren[a].setTranslateX(cardChildren[a].origin[0]);
+							cardChildren[a].setTranslateY(cardChildren[a].origin[1]);
+							a++;
+						}
 					}
-					stackPrinter();
+					//stackPrinter();
 				}
 			}
 		});
+	}
+
+	// Get all "children" of card
+	public Card[] cardChildren(Card c) {
+		Card[] children;
+		for (int i = 0; i < stacks.plateau.length; i++)
+			for (int j = 0; j < stacks.plateau[i].size(); j++)
+				if (c.equals(stacks.plateau[i].get(j))) {
+					children = new Card[stacks.plateau[i].size() - j];
+					j++;
+					int a = 0;
+					while (j < stacks.plateau[i].size()) {
+						children[a] = stacks.plateau[i].get(j);
+						a++;
+						j++;
+					}
+					return children;
+				}
+		return null;
 	}
 
 	// remove card in its plateau
@@ -148,41 +199,42 @@ public class GameStart extends Application {
 		}
 	}
 
-	// remove card in its plateau
-	public void findCard(Card pos, Card add) {
-		for (int i = 0; i < stacks.plateau.length; i++) {
-			for (int j = 0; j < stacks.plateau[i].size(); j++) {
+	// add card to new plateau
+	public void moveToNewStack(Card pos, Card add) {
+		for (int i = 0; i < stacks.plateau.length; i++)
+			for (int j = 0; j < stacks.plateau[i].size(); j++)
 				if (pos.equals(stacks.plateau[i].get(j))) {
 					stacks.plateau[i].add(add);
 					resetPlateau();
 					i = stacks.plateau.length;
 					break;
 				}
-			}
-		}
 	}
 
 	// Checks for collision of cards
-	public boolean checkBounds(Card c) {
+	public boolean checkBounds(Card c, Card[] cardChildren) {
 		boolean collisionDetected = false;
-		for (Card card : dc.Cards) {
-			if (card != c && card.isFaceUp && !card.isDeck) {
+		for (Card card : dc.Cards)
+			if (card != c && card.isFaceUp && !card.isDeck)
 				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)) {
 					// if (checkCard(c, card) && checkSuit(c, card)) {
 					collisionDetected = true;
 					removeCard(c);
-					findCard(card, c);
+					moveToNewStack(card, c);
+					int a = 0;
+					while (a < cardChildren.length && cardChildren[a] != null) {
+						removeCard(cardChildren[a]);
+						moveToNewStack(c, cardChildren[a]);
+						a++;
+					}
 					// }
 				}
-			}
-		}
-		System.out.println("");
 		return collisionDetected;
 	}
 
 	// Find distance between two cards
 	public boolean distanceCheck(Card c, Card card) {
-		if (Math.abs(c.center[0] - card.getX() - 40) < 40 && Math.abs(c.center[1] - card.getY() - 60) < 40)
+		if (Math.abs(c.center[0] - card.getX() - 40) < 45 && Math.abs(c.center[1] - card.getY() - 60) < 45)
 			return true;
 		return false;
 	}
@@ -192,7 +244,7 @@ public class GameStart extends Application {
 		for (int a = 0; a < stacks.plateau.length; a++) {
 			for (int i = 0; i < stacks.plateau[a].size(); i++) {
 				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
-				stacks.plateau[a].get(i).setY(200 + 20 * i);
+				stacks.plateau[a].get(i).setY(200 + 20 * (i * 1.5));
 			}
 		}
 	}
@@ -256,8 +308,7 @@ public class GameStart extends Application {
 		}
 	}
 
-	// Mouse event for putting deck back in original location, after being
-	// cycled through
+	// Puts deck back in original location, after being cycled through
 	EventHandler<MouseEvent> flipDeck = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle(MouseEvent t) {
@@ -270,34 +321,45 @@ public class GameStart extends Application {
 		for (int a = 0; a < stacks.plateau.length; a++) {
 			for (int i = 0; i < stacks.plateau[a].size(); i++) {
 				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
-				stacks.plateau[a].get(i).setY(200 + 20 * i);
+				stacks.plateau[a].get(i).setY(200 + 20 * (i * 1.5));
 				stacks.plateau[a].get(i).setArcWidth(10);
 				stacks.plateau[a].get(i).setArcHeight(10);
 				stacks.plateau[a].get(i).attachBack();
 				if (i == stacks.plateau[a].size() - 1)
 					stacks.plateau[a].get(i).attachFace();
 				addEvent(stacks.plateau[a].get(i));
-
 			}
 		}
 	}
 
-	// Initialize cache area empty white boxes
+	// Initialize empty boxes on board
 	public void initializeBox(Rectangle[] r) {
-		for (int a = 0; a < 5; a++) {
+		for (int a = 0; a < r.length; a++) {
 			r[a] = new Rectangle();
-			r[a].setX(380 + 120 * a);
-			r[a].setY(25);
+			if (a < 7) {
+				r[a].setX(20 + 120 * (a));
+				r[a].setY(200);
+				r[a].setStroke(Color.BLACK);
+			} else {
+				r[a].setX(380 + 120 * (a - 7));
+				r[a].setY(25);
+				r[a].setStroke(Color.WHITESMOKE);
+			}
 			r[a].setWidth(WIDTH);
 			r[a].setHeight(HEIGHT);
 			r[a].setArcWidth(10);
 			r[a].setArcHeight(10);
 			r[a].setFill(Color.GREEN);
-			r[a].setStroke(Color.WHITESMOKE);
 		}
-		// White box pos for deck
-		r[4].setX(20);
-		r[4].setY(25);
+		// White box position for deck
+		r[11].setX(20);
+		r[11].setY(25);
+	}
+
+	// Add empty white boxes to board
+	public void addBox(Rectangle[] r) {
+		for (int a = 0; a < r.length; a++)
+			board.getChildren().add(r[a]);
 	}
 
 	// Test method to look at card coordinates
