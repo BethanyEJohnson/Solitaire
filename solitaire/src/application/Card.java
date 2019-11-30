@@ -19,13 +19,11 @@ public class Card extends Rectangle {
 	// Height and width of card
 	final int WIDTH = 80;
 	final int HEIGHT = 120;
-	// If this card is near another card (For mouse event)
-	boolean isNear;
-	double TranslateX,TranslateY;
-	// Coordinate for part of card mouse is clicked on, first position in array is x second is y
+	// Coordinate for part of card mouse is clicked on, first position in array is x
+	// second is y
 	double[] center = new double[2];
 
-	// No argument constructor to get example Card
+	// No argument constructor to get empty card object
 	public Card() {
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
