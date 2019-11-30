@@ -25,6 +25,7 @@ public class GameStart extends Application {
 		launch();
 	}
 
+	// Game logic
 	public void start(Stage primaryStage) throws Exception {
 		board = new Pane();
 		board.setStyle("-fx-background-color: green");
@@ -48,9 +49,9 @@ public class GameStart extends Application {
 				dc.getCards();
 				stacks = new Stacks(dc);
 				// Set up cards on the board
-				addStacks(stacks);
-				moveDeck(stacks.deck);
-				movePlateau(stacks.plateau);
+				addStacks();
+				moveDeck();
+				movePlateau();
 			}
 		});
 
@@ -92,6 +93,8 @@ public class GameStart extends Application {
 					c.translationOrigin[1] = t.getSceneY();
 					c.origin[0] = ((Card) (t.getSource())).getTranslateX();
 					c.origin[1] = ((Card) (t.getSource())).getTranslateY();
+					// System.out.println(c.getX());
+					// System.out.println(stacks.plateau[0].get(0).getX());
 				}
 			}
 		});
@@ -117,15 +120,46 @@ public class GameStart extends Application {
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
 					if (checkBounds(c)) {
-						((Card) (t.getSource())).setTranslateX(c.TranslateX);
-						((Card) (t.getSource())).setTranslateY(c.TranslateY);
+						((Card) (t.getSource())).setTranslateX(c.origin[0]);
+						((Card) (t.getSource())).setTranslateY(c.origin[1]);
+						resetPlateau();
 					} else {
 						((Card) (t.getSource())).setTranslateX(c.origin[0]);
 						((Card) (t.getSource())).setTranslateY(c.origin[1]);
 					}
+					stackPrinter();
 				}
 			}
 		});
+	}
+
+	// remove card in its plateau
+	public void removeCard(Card c) {
+		for (int i = 0; i < stacks.plateau.length; i++) {
+			for (int j = 0; j < stacks.plateau[i].size(); j++) {
+				if (c.equals(stacks.plateau[i].get(j))) {
+					if (j != 0)
+						stacks.plateau[i].get(j - 1).attachFace();
+					stacks.plateau[i].remove(j);
+					i = stacks.plateau.length;
+					break;
+				}
+			}
+		}
+	}
+
+	// remove card in its plateau
+	public void findCard(Card pos, Card add) {
+		for (int i = 0; i < stacks.plateau.length; i++) {
+			for (int j = 0; j < stacks.plateau[i].size(); j++) {
+				if (pos.equals(stacks.plateau[i].get(j))) {
+					stacks.plateau[i].add(add);
+					resetPlateau();
+					i = stacks.plateau.length;
+					break;
+				}
+			}
+		}
 	}
 
 	// Checks for collision of cards
@@ -134,8 +168,11 @@ public class GameStart extends Application {
 		for (Card card : dc.Cards) {
 			if (card != c && card.isFaceUp && !card.isDeck) {
 				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)) {
-					if (checkCard(c, card) && checkSuit(c, card))
-						collisionDetected = true;
+					// if (checkCard(c, card) && checkSuit(c, card)) {
+					collisionDetected = true;
+					removeCard(c);
+					findCard(card, c);
+					// }
 				}
 			}
 		}
@@ -143,10 +180,21 @@ public class GameStart extends Application {
 		return collisionDetected;
 	}
 
+	// Find distance between two cards
 	public boolean distanceCheck(Card c, Card card) {
 		if (Math.abs(c.center[0] - card.getX() - 40) < 40 && Math.abs(c.center[1] - card.getY() - 60) < 40)
 			return true;
 		return false;
+	}
+
+	// Restack cards after one is moved
+	public void resetPlateau() {
+		for (int a = 0; a < stacks.plateau.length; a++) {
+			for (int i = 0; i < stacks.plateau[a].size(); i++) {
+				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
+				stacks.plateau[a].get(i).setY(200 + 20 * i);
+			}
+		}
 	}
 
 	// Comparison to see if above card is the right rank for movement
@@ -190,35 +238,45 @@ public class GameStart extends Application {
 	}
 
 	// add cards stacks entities to board
-	public void addStacks(Stacks s) {
+	public void addStacks() {
 		board.getChildren().addAll(stacks.deck);
 		for (int a = 0; a < 7; a++)
 			board.getChildren().addAll(stacks.plateau[a]);
 	}
 
 	// put deck in correct spot
-	public void moveDeck(LinkedList<Card> cards) {
-		for (int i = 0; i < cards.size(); i++) {
-			cards.get(i).attachBack();
-			cards.get(i).setX(20);
-			cards.get(i).setY(25);
-			cards.get(i).setArcWidth(10);
-			cards.get(i).setArcHeight(10);
-			addEvent(cards.get(i));
+	public void moveDeck() {
+		for (int i = 0; i < stacks.deck.size(); i++) {
+			stacks.deck.get(i).attachBack();
+			stacks.deck.get(i).setX(20);
+			stacks.deck.get(i).setY(25);
+			stacks.deck.get(i).setArcWidth(10);
+			stacks.deck.get(i).setArcHeight(10);
+			addEvent(stacks.deck.get(i));
 		}
 	}
 
+	// Mouse event for putting deck back in original location, after being
+	// cycled through
+	EventHandler<MouseEvent> flipDeck = new EventHandler<MouseEvent>() {
+		@Override
+		public void handle(MouseEvent t) {
+			moveDeck();
+		}
+	};
+
 	// Set up plateau
-	public void movePlateau(LinkedList<Card>[] plateau) {
-		for (int a = 0; a < plateau.length; a++) {
-			for (int i = 0; i < plateau[a].size(); i++) {
-				plateau[a].get(i).setX(20 + HEIGHT * a);
-				plateau[a].get(i).setY(200 + 20 * i);
-				plateau[a].get(i).setArcWidth(10);
-				plateau[a].get(i).setArcHeight(10);
-				if (i == plateau[a].size() - 1)
-					plateau[a].get(i).attachFace();
-				addEvent(plateau[a].get(i));
+	public void movePlateau() {
+		for (int a = 0; a < stacks.plateau.length; a++) {
+			for (int i = 0; i < stacks.plateau[a].size(); i++) {
+				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
+				stacks.plateau[a].get(i).setY(200 + 20 * i);
+				stacks.plateau[a].get(i).setArcWidth(10);
+				stacks.plateau[a].get(i).setArcHeight(10);
+				stacks.plateau[a].get(i).attachBack();
+				if (i == stacks.plateau[a].size() - 1)
+					stacks.plateau[a].get(i).attachFace();
+				addEvent(stacks.plateau[a].get(i));
 
 			}
 		}
@@ -242,12 +300,14 @@ public class GameStart extends Application {
 		r[4].setY(25);
 	}
 
-	// Mouse event for putting deck back in original location, after being
-	// cycled through
-	EventHandler<MouseEvent> flipDeck = new EventHandler<MouseEvent>() {
-		@Override
-		public void handle(MouseEvent t) {
-			moveDeck(stacks.deck);
+	// Test method to look at card coordinates
+	public void stackPrinter() {
+		for (int a = 0; a < stacks.plateau.length; a++) {
+			System.out.println("Stack: " + a);
+			for (int i = 0; i < stacks.plateau[a].size(); i++) {
+				Card c = stacks.plateau[a].get(i);
+				System.out.println("R: " + c.rank + "\tS: " + c.suit + "\tX:   " + c.getX() + "\tY: " + c.getY());
+			}
 		}
-	};
+	}
 }
