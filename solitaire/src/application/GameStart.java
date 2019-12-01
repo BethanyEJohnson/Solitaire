@@ -104,13 +104,11 @@ public class GameStart extends Application {
 					c.origin[0] = ((Card) (t.getSource())).getTranslateX();
 					c.origin[1] = ((Card) (t.getSource())).getTranslateY();
 					// Check if cards has cards underneath is in stack
-					boolean hasChildren;
 					Card[] cardChildren = cardChildren(c);
 					int a = 0;
 					// Pull each card to front and get coordinates
-					if (!c.isDeck)
+					if (!c.isDeck && c.hasChildren)
 						while (a < cardChildren.length && cardChildren[a] != null) {
-							hasChildren = true;
 							cardChildren[a].toFront();
 							cardChildren[a].translationOrigin[0] = c.translationOrigin[0];
 							cardChildren[a].translationOrigin[0] = c.translationOrigin[1];
@@ -134,15 +132,13 @@ public class GameStart extends Application {
 					c.center[0] = t.getSceneX();
 					c.center[1] = t.getSceneY();
 					// Check if cards has cards underneath is in stack
-					boolean hasChildren;
 					Card[] cardChildren = cardChildren(c);
 					int a = 0;
 					// Move cards underneath card c across screen
-					if (!c.isDeck)
+					if (!c.isDeck && c.hasChildren)
 						while (a < cardChildren.length && cardChildren[a] != null) {
 							Point2D p = new Point2D(((Card) (t.getSource())).getTranslateX(),
 									((Card) (t.getSource())).getTranslateY());
-							hasChildren = true;
 							cardChildren[a].setTranslateX(p.getX());
 							cardChildren[a].setTranslateY(p.getY());
 							a++;
@@ -156,17 +152,18 @@ public class GameStart extends Application {
 			@Override
 			public void handle(MouseEvent t) {
 				if (c.isFaceUp) {
-					// Check if cards has cards underneath is in stack
-					boolean hasChildren;
+					// Check if cards has cards underneath in stack
 					Card[] cardChildren = cardChildren(c);
 					int a = 0;
 					// Move cards to new position
 					if (checkBounds(c, cardChildren)) {
 						((Card) (t.getSource())).setTranslateX(c.origin[0]);
 						((Card) (t.getSource())).setTranslateY(c.origin[1]);
-						if (!c.isDeck)
-							while (a < cardChildren.length && cardChildren[a] != null && !c.isDeck) {
-								hasChildren = true;
+						c.setX(360);
+						c.setTranslateY(0);
+
+						if (!c.isDeck && c.hasChildren)
+							while (a < cardChildren.length && cardChildren[a] != null) {
 								cardChildren[a].setTranslateX(cardChildren[a].origin[0]);
 								cardChildren[a].setTranslateY(cardChildren[a].origin[1]);
 								a++;
@@ -177,36 +174,50 @@ public class GameStart extends Application {
 					else {
 						((Card) (t.getSource())).setTranslateX(c.origin[0]);
 						((Card) (t.getSource())).setTranslateY(c.origin[1]);
-						if (!c.isDeck)
-							while (a < cardChildren.length && cardChildren[a] != null && !c.isDeck) {
-								hasChildren = true;
+						if (!c.isDeck && c.hasChildren)
+							while (a < cardChildren.length && cardChildren[a] != null) {
 								cardChildren[a].setTranslateX(cardChildren[a].origin[0]);
 								cardChildren[a].setTranslateY(cardChildren[a].origin[1]);
 								a++;
 							}
 					}
+					System.out.println();
+					stackPrinter();
 				}
 			}
 		});
 	}
 
+	// Win condition
+	public void win() {
+		int cardsInCache = 0;
+		for (int a = 0; a < stacks.cache.length; a++)
+			cardsInCache += stacks.cache[a].size();
+		// Do Something if Player wins
+		// 52 cards in Deck and 4 empty cards to hold place of cache
+		if (cardsInCache == 56) {
+
+		}
+	}
+
 	// Get all "children" of card
 	public Card[] cardChildren(Card c) {
 		Card[] children;
-		for (int i = 0; i < stacks.plateau.length; i++)
-			for (int j = 0; j < stacks.plateau[i].size(); j++)
-				if (c.equals(stacks.plateau[i].get(j))) {
-					children = new Card[stacks.plateau[i].size() - j];
-					j++;
-					int a = 0;
-					while (j < stacks.plateau[i].size()) {
-						c.hasChildren = true;
-						children[a] = stacks.plateau[i].get(j);
-						a++;
+		if (!c.isDeck)
+			for (int i = 0; i < stacks.plateau.length; i++)
+				for (int j = 0; j < stacks.plateau[i].size(); j++)
+					if (c.equals(stacks.plateau[i].get(j))) {
+						children = new Card[stacks.plateau[i].size() - j];
 						j++;
+						int a = 0;
+						while (j < stacks.plateau[i].size()) {
+							c.hasChildren = true;
+							children[a] = stacks.plateau[i].get(j);
+							a++;
+							j++;
+						}
+						return children;
 					}
-					return children;
-				}
 		return null;
 	}
 
@@ -225,37 +236,74 @@ public class GameStart extends Application {
 		}
 	}
 
-	// add card to new plateau
+	// Add card to new plateau
 	public void moveToNewStack(Card pos, Card add) {
-		for (int i = 0; i < stacks.plateau.length; i++)
-			for (int j = 0; j < stacks.plateau[i].size(); j++)
-				if (pos.equals(stacks.plateau[i].get(j))) {
-					stacks.plateau[i].add(add);
-					resetPlateau();
-					i = stacks.plateau.length;
-					break;
-				}
+		// Add card to stack in plateau
+		if (!add.isCache) {
+			for (int i = 0; i < stacks.plateau.length; i++)
+				for (int j = 0; j < stacks.plateau[i].size(); j++)
+					if (pos.equals(stacks.plateau[i].get(j))) {
+						stacks.plateau[i].add(add);
+						resetPlateau();
+						i = stacks.plateau.length;
+						break;
+					}
+		}
+
+		// Add card to cache stack else
+		if (!add.isCache) {
+			for (int i = 0; i < stacks.plateau.length; i++)
+				for (int j = 0; j < stacks.plateau[i].size(); j++)
+					if (pos.equals(stacks.plateau[i].get(j))) {
+						stacks.cache[i].add(add);
+						resetCache();
+						i = stacks.plateau.length;
+						break;
+					}
+		}
+
 	}
 
 	// Checks for collision of cards
 	public boolean checkBounds(Card c, Card[] cardChildren) {
 		boolean collisionDetected = false;
+		// Plateau or deck ---> Plateau
 		for (Card card : dc.Cards)
 			if (card != c && card.isFaceUp && !card.isDeck)
 				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)) {
 					// if (checkCard(c, card) && checkSuit(c, card)) {
 					collisionDetected = true;
-					removeCard(c);
+					if (!c.isDeck)
+						removeCard(c);
+					else {
+						c.isDeck = false;
+						stacks.deck.remove(c);
+					}
 					moveToNewStack(card, c);
 					int a = 0;
 					if (c.hasChildren)
 						while (a < cardChildren.length && cardChildren[a] != null) {
+							System.out.println(1);
 							removeCard(cardChildren[a]);
 							moveToNewStack(c, cardChildren[a]);
 							a++;
 						}
 					// }
 				}
+
+		for (int a = 0; a < stacks.cache.length; a++)
+			for (Card card : stacks.cache[a]) {
+				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)
+						&& !c.hasChildren) {
+					collisionDetected = true;
+					removeCard(c);
+					moveToNewStack(card, c);
+				}
+			}
+
+		// Plateau/Deck ---> cache
+
+		// Cache ---> Plateau
 		return collisionDetected;
 	}
 
@@ -352,6 +400,30 @@ public class GameStart extends Application {
 		}
 	}
 
+	// Set up cache
+	public void moveCache() {
+		for (int a = 0; a < stacks.cache.length; a++) {
+			board.getChildren().addAll(stacks.cache[a]);
+			stacks.cache[a].get(0).setX(380 + 120 * a);
+			stacks.cache[a].get(0).setY(25);
+			stacks.cache[a].get(0).setArcWidth(10);
+			stacks.cache[a].get(0).setArcHeight(10);
+			stacks.cache[a].get(0).setStroke(Color.WHITESMOKE);
+			stacks.cache[a].get(0).setFill(Color.GREEN);
+		}
+	}
+
+	// Restack the cache
+	public void resetCache() {
+		for (int a = 0; a < stacks.cache.length; a++) {
+			for (int b = 1; b < stacks.cache[a].size(); b++) {
+				stacks.cache[a].get(b).toFront();
+				stacks.cache[a].get(b).setX(380 + 120 * a);
+				stacks.cache[a].get(b).setY(25);
+			}
+		}
+	}
+
 	// Initialize empty boxes on board
 	public void initializeBox(Rectangle[] r) {
 		for (int a = 0; a < r.length; a++) {
@@ -384,10 +456,21 @@ public class GameStart extends Application {
 
 	// Test method to look at card coordinates
 	public void stackPrinter() {
-		for (int a = 0; a < stacks.plateau.length; a++) {
+		for (int a = 0; a < 3; a++) {
 			System.out.println("Stack: " + a);
 			for (int i = 0; i < stacks.plateau[a].size(); i++) {
 				Card c = stacks.plateau[a].get(i);
+				System.out.println("R: " + c.rank + "\tS: " + c.suit + "\tX:   " + c.getX() + "\tY: " + c.getY());
+			}
+		}
+	}
+
+	// Test method to look at cache card coordinates
+	public void cachePrinter() {
+		for (int a = 0; a < stacks.cache.length; a++) {
+			System.out.println("Stack: " + a);
+			for (int i = 0; i < stacks.cache[a].size(); i++) {
+				Card c = stacks.cache[a].get(i);
 				System.out.println("R: " + c.rank + "\tS: " + c.suit + "\tX:   " + c.getX() + "\tY: " + c.getY());
 			}
 		}
