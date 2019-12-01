@@ -25,10 +25,8 @@ DeckOfCards (Singelton), you can click on space deck is initially in to flip dec
 
 Changes Uploaded on 11/30
 
-Cards now will fix themselves correctly when moved. Card will now move any cards beneath it in main stacks, deck cycle is fully functional now, can move to cache now
+Cards now will fix themselves correctly when moved. Card will now move any cards beneath it in main stacks, deck cycle is fully functional now, can move to cache now, can now move king to empty spots in plateau. Game should be fully functional.
 
 Task List:
 
-- Logic for cache
-- Add logic for kings to be able to be moved to empty Spots in Plateau
 - Implement design patterns
