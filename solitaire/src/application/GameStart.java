@@ -191,7 +191,6 @@ public class GameStart extends Application {
 		int cardsInCache = 0;
 		for (int a = 0; a < stacks.cache.length; a++)
 			cardsInCache += stacks.cache[a].size();
-		System.out.println(cardsInCache);
 		// Do Something if Player wins
 		// 52 cards in Deck and 4 empty cards to hold place of cache
 		if (cardsInCache == 56) {
@@ -204,7 +203,7 @@ public class GameStart extends Application {
 		Card[] children;
 		if (!c.isDeck)
 			for (int i = 0; i < stacks.plateau.length; i++)
-				for (int j = 0; j < stacks.plateau[i].size(); j++)
+				for (int j = 1; j < stacks.plateau[i].size(); j++)
 					if (c.equals(stacks.plateau[i].get(j))) {
 						children = new Card[stacks.plateau[i].size() - j];
 						j++;
@@ -224,9 +223,9 @@ public class GameStart extends Application {
 	public void removeCard(Card c) {
 		if (!c.isCache) {
 			for (int i = 0; i < stacks.plateau.length; i++)
-				for (int j = 0; j < stacks.plateau[i].size(); j++)
+				for (int j = 1; j < stacks.plateau[i].size(); j++)
 					if (c.equals(stacks.plateau[i].get(j))) {
-						if (j != 0)
+						if (j != 1)
 							stacks.plateau[i].get(j - 1).attachFace();
 						stacks.plateau[i].remove(j);
 						i = stacks.plateau.length;
@@ -277,13 +276,37 @@ public class GameStart extends Application {
 	public boolean checkBounds(Card c, Card[] cardChildren) {
 		boolean collisionDetected = false;
 		if (!c.isCache) {
+			// King to Empty Stack
+			if (c.rank == "K") {
+				for (int i = 0; i < stacks.plateau.length; i++) {
+					Card card = stacks.plateau[i].get(0);
+					if (cIntersect(c, card) && stacks.plateau[i].size() == 1 && distanceCheck(c, card)) {
+						collisionDetected = true;
+						if (!c.isDeck) {
+							removeCard(c);
+						} else {
+							c.isDeck = false;
+							stacks.deck.remove(c);
+						}
+						moveToNewStack(card, c);
+						int a = 0;
+						if (c.hasChildren)
+							while (a < cardChildren.length && cardChildren[a] != null) {
+								removeCard(cardChildren[a]);
+								moveToNewStack(c, cardChildren[a]);
+								a++;
+							}
+					}
+				}
+			}
+
 			// Plateau/deck ---> Plateau
 			for (int i = 0; i < stacks.plateau.length; i++)
-				for (int b = 0; b < stacks.plateau[i].size(); b++) {
+				for (int b = 1; b < stacks.plateau[i].size(); b++) {
 					Card card = stacks.plateau[i].get(b);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
-							// if (checkRankForPlateau(c, card) && checkSuitForPlateau(c, card)) {
+							if (checkRankForPlateau(c, card) && checkSuitForPlateau(c, card)) {
 							collisionDetected = true;
 							if (!c.isDeck) {
 								removeCard(c);
@@ -299,7 +322,7 @@ public class GameStart extends Application {
 									moveToNewStack(c, cardChildren[a]);
 									a++;
 								}
-							// }
+							}
 						}
 				}
 
@@ -308,8 +331,7 @@ public class GameStart extends Application {
 				for (int b = 0; b < stacks.cache[a].size(); b++) {
 					Card card = stacks.cache[a].get(b);
 					if (cIntersect(c, card) && distanceCheck(c, card) && !c.hasChildren && c != card) {
-						// if (checkRankForCache(c, card) && checkSuitForCache(c, card)) {
-						System.out.println("stop1");
+						if (checkRankForCache(c, card) && checkSuitForCache(c, card)) {
 						collisionDetected = true;
 						if (c.isDeck) {
 							c.isDeck = false;
@@ -317,16 +339,15 @@ public class GameStart extends Application {
 						} else
 							removeCard(c);
 						moveToNewStack(card, c);
-						// }
+						}
 					}
 				}
 		}
 
 		// Cache ---> Plateau
 		if (c.isCache) {
-			System.out.println("stop2");
 			for (int a = 0; a < stacks.plateau.length; a++)
-				for (int b = 0; b < stacks.plateau[a].size(); b++) {
+				for (int b = 1; b < stacks.plateau[a].size(); b++) {
 					Card card = stacks.plateau[a].get(b);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
@@ -335,6 +356,7 @@ public class GameStart extends Application {
 							moveToNewStack(card, c);
 						}
 				}
+			return collisionDetected;
 		}
 		return collisionDetected;
 	}
@@ -452,9 +474,16 @@ public class GameStart extends Application {
 	// Initially set up the Plateau
 	public void movePlateau() {
 		for (int a = 0; a < stacks.plateau.length; a++) {
-			for (int i = 0; i < stacks.plateau[a].size(); i++) {
+			stacks.plateau[a].get(0).setX(20 + HEIGHT * a);
+			stacks.plateau[a].get(0).setY(200 + 20 * (0 * 1.5));
+			stacks.plateau[a].get(0).setStroke(Color.BLACK);
+			stacks.plateau[a].get(0).setFill(Color.GREEN);
+			stacks.plateau[a].get(0).setArcWidth(10);
+			stacks.plateau[a].get(0).setArcHeight(10);
+			for (int i = 1; i < stacks.plateau[a].size(); i++) {
+				stacks.plateau[a].get(i).toFront();
 				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
-				stacks.plateau[a].get(i).setY(200 + 20 * (i * 1.5));
+				stacks.plateau[a].get(i).setY(200 + 20 * ((i - 1) * 1.5));
 				stacks.plateau[a].get(i).setArcWidth(10);
 				stacks.plateau[a].get(i).setArcHeight(10);
 				stacks.plateau[a].get(i).attachBack();
@@ -468,9 +497,9 @@ public class GameStart extends Application {
 	// Restack cards after one is moved
 	public void resetPlateau() {
 		for (int a = 0; a < stacks.plateau.length; a++) {
-			for (int i = 0; i < stacks.plateau[a].size(); i++) {
+			for (int i = 1; i < stacks.plateau[a].size(); i++) {
 				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
-				stacks.plateau[a].get(i).setY(200 + 20 * (i * 1.5));
+				stacks.plateau[a].get(i).setY(200 + 20 * ((i - 1) * 1.5));
 			}
 		}
 	}
@@ -534,7 +563,7 @@ public class GameStart extends Application {
 	public void stackPrinter() {
 		for (int a = 0; a < stacks.plateau.length; a++) {
 			System.out.println("Stack: " + a);
-			for (int i = 0; i < stacks.plateau[a].size(); i++) {
+			for (int i = 1; i < stacks.plateau[a].size(); i++) {
 				Card c = stacks.plateau[a].get(i);
 				System.out.println("R: " + c.rank + "\tS: " + c.suit + "\tX:   " + c.getX() + "\tY: " + c.getY());
 			}

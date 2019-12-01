@@ -15,6 +15,8 @@ public class Card extends Rectangle {
 	boolean isDeck;
 	// boolean value to check if a area is cache area
 	boolean isCache;
+	// boolean value to check if a area is plateau
+	boolean isPlateau;
 	// boolean value of whether card has children(card underneath it)
 	boolean hasChildren;
 	// Coordinates for moving a card, first position in array is x second is y
@@ -23,8 +25,7 @@ public class Card extends Rectangle {
 	// Height and width of card
 	final int WIDTH = 80;
 	final int HEIGHT = 120;
-	// Coordinate for part of card mouse is clicked on, first position in array is x
-	// second is y
+	// Center of Card
 	double[] center = new double[2];
 
 	// No argument constructor to get empty card object
