@@ -179,7 +179,7 @@ public class GameStart extends Application {
 								a++;
 							}
 					}
-					// stackPrinter();
+					//stackPrinter();
 				}
 			}
 		});
@@ -220,14 +220,24 @@ public class GameStart extends Application {
 
 	// remove card in its plateau
 	public void removeCard(Card c) {
-		for (int i = 0; i < stacks.plateau.length; i++) {
-			for (int j = 0; j < stacks.plateau[i].size(); j++) {
-				if (c.equals(stacks.plateau[i].get(j))) {
-					if (j != 0)
-						stacks.plateau[i].get(j - 1).attachFace();
-					stacks.plateau[i].remove(j);
-					i = stacks.plateau.length;
-					break;
+		if (!c.isCache) {
+			for (int i = 0; i < stacks.plateau.length; i++)
+				for (int j = 0; j < stacks.plateau[i].size(); j++)
+					if (c.equals(stacks.plateau[i].get(j))) {
+						if (j != 0)
+							stacks.plateau[i].get(j - 1).attachFace();
+						stacks.plateau[i].remove(j);
+						i = stacks.plateau.length;
+						break;
+					}
+		}
+		if (c.isCache) {
+			for (int a = 0; a < stacks.cache.length; a++) {
+				for (int i = 0; i < stacks.cache[a].size(); i++) {
+					if(c.equals(stacks.cache[a].get(i))) {
+						stacks.cache[a].remove(c);
+						c.isCache = false;
+					}
 				}
 			}
 		}
@@ -248,7 +258,6 @@ public class GameStart extends Application {
 		}
 
 		// Add card to cache stack else
-		System.out.println(pos.isCache);
 		if (pos.isCache) {
 			for (int i = 0; i < stacks.cache.length; i++)
 				for (int j = 0; j < stacks.cache[i].size(); j++)
@@ -265,51 +274,65 @@ public class GameStart extends Application {
 	// Checks for collision of cards
 	public boolean checkBounds(Card c, Card[] cardChildren) {
 		boolean collisionDetected = false;
-		// Plateau or deck ---> Plateau
-		for (Card card : dc.Cards)
-			if (card != c && card.isFaceUp && !card.isDeck)
-				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card) && c != card) {
-					// if (checkCard(c, card) && checkSuit(c, card)) {
-					collisionDetected = true;
-					if (!c.isDeck) {
-						removeCard(c);
-					}
-					else {
-						c.isDeck = false;
-						stacks.deck.remove(c);
-					}
-					moveToNewStack(card, c);
-					int a = 0;
-					if (c.hasChildren)
-						while (a < cardChildren.length && cardChildren[a] != null) {
-							removeCard(cardChildren[a]);
-							moveToNewStack(c, cardChildren[a]);
-							a++;
+		if (!c.isCache) {
+			// Plateau/deck ---> Plateau
+			for (Card card : dc.Cards)
+				if (card != c && card.isFaceUp && !card.isDeck)
+					if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
+						// if (checkCard(c, card) && checkSuit(c, card)) {
+						collisionDetected = true;
+						if (!c.isDeck) {
+							removeCard(c);
+						} else {
+							c.isDeck = false;
+							stacks.deck.remove(c);
 						}
-					// }
-				}
-
-		// Plateau ---> cache
-		for (int a = 0; a < stacks.cache.length; a++)
-			for (int b = 0; b < stacks.cache[a].size(); b++) {
-				Card card = stacks.cache[a].get(b);
-				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)
-						&& !c.hasChildren && c != card) {
-					collisionDetected = true;
-					if(c.isDeck) {
-						c.isDeck = false;
-						stacks.deck.remove(c);
+						moveToNewStack(card, c);
+						int a = 0;
+						if (c.hasChildren)
+							while (a < cardChildren.length && cardChildren[a] != null) {
+								removeCard(cardChildren[a]);
+								moveToNewStack(c, cardChildren[a]);
+								a++;
+							}
+						// }
 					}
-					else
-						removeCard(c);
-					moveToNewStack(card, c);
-				}
-			}
 
-		// Plateau/Deck ---> cache
+			// Plateau/Deck ---> cache
+			for (int a = 0; a < stacks.cache.length; a++)
+				for (int b = 0; b < stacks.cache[a].size(); b++) {
+					Card card = stacks.cache[a].get(b);
+					if (cIntersect(c, card) && distanceCheck(c, card) && !c.hasChildren && c != card) {
+						collisionDetected = true;
+						if (c.isDeck) {
+							c.isDeck = false;
+							stacks.deck.remove(c);
+						} else
+							removeCard(c);
+						moveToNewStack(card, c);
+					}
+				}
+		}
 
 		// Cache ---> Plateau
+		if (c.isCache) {
+			for (int a = 0; a < stacks.plateau.length; a++)
+				for (int b = 0; b < stacks.plateau[a].size(); b++) {
+					Card card = stacks.plateau[a].get(b);
+					if (card != c && card.isFaceUp && !card.isDeck)
+						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
+							collisionDetected = true;
+							removeCard(c);
+							moveToNewStack(card, c);
+						}
+				}
+		}
 		return collisionDetected;
+	}
+
+	// Checks if two cards intersect by their bounds
+	public boolean cIntersect(Card c, Card card) {
+		return c.getBoundsInParent().intersects(card.getBoundsInParent());
 	}
 
 	// Find distance between two cards
@@ -428,7 +451,7 @@ public class GameStart extends Application {
 				stacks.cache[a].get(b).setY(25);
 			}
 		}
-		cachePrinter();
+		//cachePrinter();
 	}
 
 	// Initialize empty boxes on board
@@ -463,7 +486,7 @@ public class GameStart extends Application {
 
 	// Test method to look at card coordinates
 	public void stackPrinter() {
-		for (int a = 0; a < 3; a++) {
+		for (int a = 0; a < stacks.plateau.length; a++) {
 			System.out.println("Stack: " + a);
 			for (int i = 0; i < stacks.plateau[a].size(); i++) {
 				Card c = stacks.plateau[a].get(i);
