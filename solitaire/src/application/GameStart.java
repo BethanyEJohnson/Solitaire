@@ -271,8 +271,9 @@ public class GameStart extends Application {
 				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card) && c != card) {
 					// if (checkCard(c, card) && checkSuit(c, card)) {
 					collisionDetected = true;
-					if (!c.isDeck)
+					if (!c.isDeck) {
 						removeCard(c);
+					}
 					else {
 						c.isDeck = false;
 						stacks.deck.remove(c);
@@ -295,7 +296,12 @@ public class GameStart extends Application {
 				if (c.getBoundsInParent().intersects(card.getBoundsInParent()) && distanceCheck(c, card)
 						&& !c.hasChildren && c != card) {
 					collisionDetected = true;
-					removeCard(c);
+					if(c.isDeck) {
+						c.isDeck = false;
+						stacks.deck.remove(c);
+					}
+					else
+						removeCard(c);
 					moveToNewStack(card, c);
 				}
 			}
@@ -422,7 +428,7 @@ public class GameStart extends Application {
 				stacks.cache[a].get(b).setY(25);
 			}
 		}
-		//cachePrinter();
+		cachePrinter();
 	}
 
 	// Initialize empty boxes on board
