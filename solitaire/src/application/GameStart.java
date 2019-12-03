@@ -20,6 +20,10 @@ public class GameStart extends Application {
 	final int HEIGHT = cardEx.HEIGHT;
 	DeckOfCards dc;
 	Stacks stacks;
+	PlateauRank pRank = new PlateauRank();
+	PlateauSuit pSuit = new PlateauSuit();
+	CacheRank cRank = new CacheRank();
+	CacheSuit cSuit = new CacheSuit();
 
 	public static void main(String[] args) {
 		launch();
@@ -306,7 +310,7 @@ public class GameStart extends Application {
 					Card card = stacks.plateau[i].get(b);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
-							if (checkRankForPlateau(c, card) && checkSuitForPlateau(c, card)) {
+							if (pRank.check(c, card) && pSuit.check(c, card)) {
 							collisionDetected = true;
 							if (!c.isDeck) {
 								removeCard(c);
@@ -331,7 +335,7 @@ public class GameStart extends Application {
 				for (int b = 0; b < stacks.cache[a].size(); b++) {
 					Card card = stacks.cache[a].get(b);
 					if (cIntersect(c, card) && distanceCheck(c, card) && !c.hasChildren && c != card) {
-						if (checkRankForCache(c, card) && checkSuitForCache(c, card)) {
+						if (cRank.check(c, card) && cSuit.check(c, card)) {
 						collisionDetected = true;
 						if (c.isDeck) {
 							c.isDeck = false;
@@ -374,82 +378,16 @@ public class GameStart extends Application {
 	}
 
 	// Comparison to see if above card is the right rank for movement
-	public boolean checkRankForPlateau(Card orig, Card top) {
-		if (orig.rank == "A" && top.rank == "2")
-			return true;
-		if (orig.rank == "2" && top.rank == "3")
-			return true;
-		if (orig.rank == "3" && top.rank == "4")
-			return true;
-		if (orig.rank == "4" && top.rank == "5")
-			return true;
-		if (orig.rank == "5" && top.rank == "6")
-			return true;
-		if (orig.rank == "6" && top.rank == "7")
-			return true;
-		if (orig.rank == "7" && top.rank == "8")
-			return true;
-		if (orig.rank == "8" && top.rank == "9")
-			return true;
-		if (orig.rank == "9" && top.rank == "10")
-			return true;
-		if (orig.rank == "10" && top.rank == "J")
-			return true;
-		if (orig.rank == "J" && top.rank == "Q")
-			return true;
-		if (orig.rank == "Q" && top.rank == "K")
-			return true;
-		if (orig.rank == "K" && top.rank == null)
-			return true;
-		return false;
-	}
+	//Moved to facade
 
 	// Comparison to see if above card is the right suit for movement
-	public boolean checkSuitForPlateau(Card orig, Card top) {
-		if ((orig.suit == "H" || orig.suit == "D") && (top.suit == "S" || top.suit == "C"))
-			return true;
-		if ((orig.suit == "S" || orig.suit == "C") && (top.suit == "H" || top.suit == "D"))
-			return true;
-		return false;
-	}
+	//Moved to facade
 
 	// Comparison to see if above card is the right rank for movement
-	public boolean checkRankForCache(Card orig, Card top) {
-		if (orig.rank == "A" && top.rank == null)
-			return true;
-		if (orig.rank == "2" && top.rank == "A")
-			return true;
-		if (orig.rank == "3" && top.rank == "2")
-			return true;
-		if (orig.rank == "4" && top.rank == "3")
-			return true;
-		if (orig.rank == "5" && top.rank == "4")
-			return true;
-		if (orig.rank == "6" && top.rank == "5")
-			return true;
-		if (orig.rank == "7" && top.rank == "6")
-			return true;
-		if (orig.rank == "8" && top.rank == "7")
-			return true;
-		if (orig.rank == "9" && top.rank == "8")
-			return true;
-		if (orig.rank == "10" && top.rank == "9")
-			return true;
-		if (orig.rank == "J" && top.rank == "10")
-			return true;
-		if (orig.rank == "Q" && top.rank == "J")
-			return true;
-		if (orig.rank == "K" && top.rank == "Q")
-			return true;
-		return false;
-	}
+	//Moved to facade
 
 	// Comparison to see if above card is the right suit for movement
-	public boolean checkSuitForCache(Card orig, Card top) {
-		if (orig.suit == top.suit || top.suit == null)
-			return true;
-		return false;
-	}
+	//Moved to facade
 
 	// add cards stacks entities to board
 	public void addStacks() {
