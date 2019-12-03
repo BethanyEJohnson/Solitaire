@@ -53,7 +53,6 @@ public class GameStart extends Application {
 				});
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
-				dc.getCards();
 				stacks = new Stacks(dc);
 				// Set up cards on the board
 				moveDeck();

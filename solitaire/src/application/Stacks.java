@@ -10,8 +10,6 @@ public class Stacks {
 	LinkedList<Card> deck = new LinkedList<Card>();
 	LinkedList<Card> temp = new LinkedList<Card>();
 
-	// Place holders for cache
-
 	// Constructor takes a deck of cards to configure all the stacks
 	public Stacks(DeckOfCards dc) {
 		iniPlateau();
@@ -24,7 +22,9 @@ public class Stacks {
 	public void iniPlateau() {
 		plateau = new LinkedList[7];
 		for (int a = 0; a < 7; a++) {
+			Card placeHolder = new Card();
 			plateau[a] = new LinkedList<Card>();
+			plateau[a].add(placeHolder);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class Stacks {
 		// Add the correct amount of cards to each of the stacks that make up the
 		// plateau
 		for (int a = 0; a < 7; a++)
-			for (int b = 0; b <= a; b++) {
+			for (int b = 1; b <= a + 1; b++) {
 				plateau[a].add(dc.Cards[increment]);
 				increment++;
 			}

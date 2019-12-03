@@ -21,7 +21,18 @@ public class DeckOfCards {
 		if(dc == null) {
 			dc = new DeckOfCards();
 		}
+		cleanCards(dc.Cards);
+		shuffle(dc.Cards);
 		return dc;
+	}
+	
+	public static void cleanCards(Card[] C) {
+		for (int a = 0; a < 52; a++) {
+			C[a].hasChildren = false;
+			C[a].isFaceUp = false;
+			C[a].isCache = false;
+			C[a].isDeck = false;
+		}
 	}
 
 	// initializes a deck of 52 unique card objects
@@ -32,12 +43,11 @@ public class DeckOfCards {
 				Cards[j + 13 * i] = c;
 			}
 		}
-		shuffle();
 	}
 
 	// shuffles the deck of cards
-	public Card[] shuffle() {
-		List<Card> list = Arrays.asList(Cards);
+	public static Card[] shuffle(Card[] C) {
+		List<Card> list = Arrays.asList(C);
 		Collections.shuffle(list);
 		return (Card[]) list.toArray();
 	}
