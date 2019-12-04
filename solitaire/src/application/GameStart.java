@@ -155,6 +155,8 @@ public class GameStart extends Application {
 		c.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent t) {
+				WinStatus win = new WinStatus(stacks);
+
 				if (c.isFaceUp) {
 					// Check if cards has cards underneath in stack
 					Card[] cardChildren = cardChildren(c);
@@ -183,24 +185,13 @@ public class GameStart extends Application {
 							}
 					}
 					c.hasChildren = false;
-					win();
+					win.update();
 				}
 			}
 		});
 	}
 
-	// Win condition
-	public void win() {
-		int cardsInCache = 0;
-		for (int a = 0; a < stacks.cache.length; a++)
-			cardsInCache += stacks.cache[a].size();
-		// Do Something if Player wins
-		// 52 cards in Deck and 4 empty cards to hold place of cache
-		if (cardsInCache == 56) {
-			System.out.println("you win!");
-		}
-	}
-
+	
 	// Get all "children" of card
 	public Card[] cardChildren(Card c) {
 		Card[] children;
