@@ -15,8 +15,6 @@ public class Card extends Rectangle {
 	boolean isDeck;
 	// boolean value to check if a area is cache area
 	boolean isCache;
-	// boolean value to check if a area is plateau
-	boolean isPlateau;
 	// boolean value of whether card has children(card underneath it)
 	boolean hasChildren;
 	// Coordinates for moving a card, first position in array is x second is y
