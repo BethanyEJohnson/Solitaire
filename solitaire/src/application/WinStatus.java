@@ -15,6 +15,7 @@ public class WinStatus {
 
 	// to check class
 	public void display() {
+		cardsInCache = 0;
 		// int cardsInCache = 0;
 		for (int a = 0; a < this.stacks.cache.length; a++)
 			cardsInCache += this.stacks.cache[a].size();
@@ -23,7 +24,7 @@ public class WinStatus {
 			System.out.println("you win!");
 		}
 		else {
-			System.out.println("Current cards in stack: " + cardsInCache);
+			System.out.println("Current cards in stack: " + (cardsInCache - 4));
 		}
 	}
 }

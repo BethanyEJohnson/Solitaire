@@ -40,7 +40,6 @@ public class DeckOfCards {
 		for (int i = 0; i < suit.length; i++) {
 			for (int j = 0; j < rank.length; j++) {
 				Card c = new Card(suit[i], rank[j], new SolitaireRank(), new SolitaireSuit());
-				System.out.println(c.sb);
 				Cards[j + 13 * i] = c;
 			}
 		}

@@ -153,14 +153,13 @@ public class GameStart extends Application {
 		c.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent t) {
-				win.update(stacks);
-
 				if (c.isFaceUp) {
 					// Check if cards has cards underneath in stack
 					Card[] cardChildren = cardChildren(c);
 					int a = 0;
 					// Move cards to new position
 					if (checkBounds(c, cardChildren)) {
+						win.update(stacks);
 						((Card) (t.getSource())).setTranslateX(c.origin[0]);
 						((Card) (t.getSource())).setTranslateY(c.origin[1]);
 						if (!c.isDeck && c.hasChildren)
@@ -320,7 +319,6 @@ public class GameStart extends Application {
 				for (int j = 0; j < stacks.cache[i].size(); j++) {
 					Card card = stacks.cache[i].get(j);
 					if (cIntersect(c, card) && distanceCheck(c, card) && !c.hasChildren && c != card) {
-						System.out.println(c.rb);
 						if (c.rb.cacheRank(c, card) && c.sb.cacheSuit(c, card)) {
 							collisionDetected = true;
 							if (c.isDeck) {
