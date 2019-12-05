@@ -5,10 +5,10 @@ import java.util.*;
 public class Stacks {
 
 	// Each stack is made as a LinkedList
-	LinkedList<Card>[] cache;
-	LinkedList<Card>[] plateau;
-	LinkedList<Card> deck = new LinkedList<Card>();
-	LinkedList<Card> temp = new LinkedList<Card>();
+	ArrayList<Card>[] cache;
+	ArrayList<Card>[] plateau;
+	ArrayList<Card> deck = new ArrayList<Card>();
+	ArrayList<Card> temp = new ArrayList<Card>();
 
 	// Constructor takes a deck of cards to configure all the stacks
 	public Stacks(DeckOfCards dc) {
@@ -20,10 +20,10 @@ public class Stacks {
 	// Initialize Plateau
 	@SuppressWarnings("unchecked")
 	public void iniPlateau() {
-		plateau = new LinkedList[7];
+		plateau = new ArrayList[7];
 		for (int a = 0; a < 7; a++) {
 			Card placeHolder = new Card();
-			plateau[a] = new LinkedList<Card>();
+			plateau[a] = new ArrayList<Card>();
 			plateau[a].add(placeHolder);
 		}
 	}
@@ -31,9 +31,9 @@ public class Stacks {
 	// Initialize Cache
 	@SuppressWarnings("unchecked")
 	public void iniCache() {
-		cache = new LinkedList[4];
+		cache = new ArrayList[4];
 		for (int a = 0; a < 4; a++) {
-			cache[a] = new LinkedList<Card>();
+			cache[a] = new ArrayList<Card>();
 			Card placeHolder = new Card();
 			placeHolder.isCache = true;
 			cache[a].add(placeHolder);
