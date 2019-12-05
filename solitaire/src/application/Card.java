@@ -7,6 +7,10 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 public class Card extends Rectangle {
+	//Behaviors for card rank and suit
+	RankBehavior rb;
+	SuitBehavior sb;
+
 	String suit;
 	String rank;
 	// boolean value to determine if card is face up

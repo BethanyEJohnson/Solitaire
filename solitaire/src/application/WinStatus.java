@@ -1,6 +1,10 @@
 package application;
 
-public class WinStatus extends GameStart{
+interface Observer {
+	public void update();
+}
+
+public class WinStatus implements Observer {
 	Stacks stacks;
 	int cardsInCache = 0;
 	

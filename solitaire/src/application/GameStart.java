@@ -20,10 +20,6 @@ public class GameStart extends Application {
 	final int HEIGHT = cardEx.HEIGHT;
 	DeckOfCards dc;
 	Stacks stacks;
-	PlateauRank pRank = new PlateauRank();
-	PlateauSuit pSuit = new PlateauSuit();
-	CacheRank cRank = new CacheRank();
-	CacheSuit cSuit = new CacheSuit();
 
 	public static void main(String[] args) {
 		launch();
@@ -171,7 +167,6 @@ public class GameStart extends Application {
 								cardChildren[a].setTranslateY(cardChildren[a].origin[1]);
 								a++;
 							}
-						resetPlateau();
 					}
 					// Move cards to original position
 					else {
@@ -191,7 +186,6 @@ public class GameStart extends Application {
 		});
 	}
 
-	
 	// Get all "children" of card
 	public Card[] cardChildren(Card c) {
 		Card[] children;
@@ -227,10 +221,10 @@ public class GameStart extends Application {
 					}
 		}
 		if (c.isCache) {
-			for (int a = 0; a < stacks.cache.length; a++) {
-				for (int i = 0; i < stacks.cache[a].size(); i++) {
-					if (c.equals(stacks.cache[a].get(i))) {
-						stacks.cache[a].remove(c);
+			for (int i = 0; i < stacks.cache.length; i++) {
+				for (int j = 0; j < stacks.cache[i].size(); j++) {
+					if (c.equals(stacks.cache[i].get(j))) {
+						stacks.cache[i].remove(c);
 						c.isCache = false;
 					}
 				}
@@ -246,24 +240,23 @@ public class GameStart extends Application {
 				for (int j = 0; j < stacks.plateau[i].size(); j++)
 					if (pos.equals(stacks.plateau[i].get(j))) {
 						stacks.plateau[i].add(add);
-						resetPlateau();
+						resetPlateau(i);
 						i = stacks.plateau.length;
 						break;
 					}
 		}
 
-		// Add card to cache stack else
+		// Add card to cache stack
 		if (pos.isCache) {
 			for (int i = 0; i < stacks.cache.length; i++)
 				for (int j = 0; j < stacks.cache[i].size(); j++)
 					if (pos.equals(stacks.cache[i].get(j))) {
 						stacks.cache[i].add(add);
-						i = stacks.plateau.length;
+						resetCache(i);
+						i = stacks.cache.length;
 						break;
 					}
-			resetCache();
 		}
-
 	}
 
 	// Checks for collision of cards
@@ -273,6 +266,8 @@ public class GameStart extends Application {
 			// King to Empty Stack
 			if (c.rank == "K") {
 				for (int i = 0; i < stacks.plateau.length; i++) {
+					c.rb = new PlateauRank();
+					c.sb = new PlateauSuit();
 					Card card = stacks.plateau[i].get(0);
 					if (cIntersect(c, card) && stacks.plateau[i].size() == 1 && distanceCheck(c, card)) {
 						collisionDetected = true;
@@ -296,43 +291,47 @@ public class GameStart extends Application {
 
 			// Plateau/deck ---> Plateau
 			for (int i = 0; i < stacks.plateau.length; i++)
-				for (int b = 1; b < stacks.plateau[i].size(); b++) {
-					Card card = stacks.plateau[i].get(b);
+				for (int j = 1; j < stacks.plateau[i].size(); j++) {
+					Card card = stacks.plateau[i].get(j);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
-							if (pRank.check(c, card) && pSuit.check(c, card)) {
-							collisionDetected = true;
-							if (!c.isDeck) {
-								removeCard(c);
-							} else {
-								c.isDeck = false;
-								stacks.deck.remove(c);
-							}
-							moveToNewStack(card, c);
-							int a = 0;
-							if (c.hasChildren)
-								while (a < cardChildren.length && cardChildren[a] != null) {
-									removeCard(cardChildren[a]);
-									moveToNewStack(c, cardChildren[a]);
-									a++;
+							c.rb = new PlateauRank();
+							c.sb = new PlateauSuit();
+							if (c.rb.rankRule(c, card) && c.sb.suitRule(c, card)) {
+								collisionDetected = true;
+								if (!c.isDeck) {
+									removeCard(c);
+								} else {
+									c.isDeck = false;
+									stacks.deck.remove(c);
 								}
+								moveToNewStack(card, c);
+								int a = 0;
+								if (c.hasChildren)
+									while (a < cardChildren.length && cardChildren[a] != null) {
+										removeCard(cardChildren[a]);
+										moveToNewStack(c, cardChildren[a]);
+										a++;
+									}
 							}
 						}
 				}
 
 			// Plateau/Deck ---> cache
-			for (int a = 0; a < stacks.cache.length; a++)
-				for (int b = 0; b < stacks.cache[a].size(); b++) {
-					Card card = stacks.cache[a].get(b);
+			for (int i = 0; i < stacks.cache.length; i++)
+				for (int j = 0; j < stacks.cache[i].size(); j++) {
+					Card card = stacks.cache[i].get(j);
 					if (cIntersect(c, card) && distanceCheck(c, card) && !c.hasChildren && c != card) {
-						if (cRank.check(c, card) && cSuit.check(c, card)) {
-						collisionDetected = true;
-						if (c.isDeck) {
-							c.isDeck = false;
-							stacks.deck.remove(c);
-						} else
-							removeCard(c);
-						moveToNewStack(card, c);
+						c.rb = new CacheRank();
+						c.sb = new CacheSuit();
+						if (c.rb.rankRule(c, card) && c.sb.suitRule(c, card)) {
+							collisionDetected = true;
+							if (c.isDeck) {
+								c.isDeck = false;
+								stacks.deck.remove(c);
+							} else
+								removeCard(c);
+							moveToNewStack(card, c);
 						}
 					}
 				}
@@ -340,14 +339,19 @@ public class GameStart extends Application {
 
 		// Cache ---> Plateau
 		if (c.isCache) {
-			for (int a = 0; a < stacks.plateau.length; a++)
-				for (int b = 1; b < stacks.plateau[a].size(); b++) {
-					Card card = stacks.plateau[a].get(b);
+			c.rb = new PlateauRank();
+			c.sb = new PlateauSuit();
+			System.out.println("here");
+			for (int i = 0; i < stacks.plateau.length; i++)
+				for (int j = 1; j < stacks.plateau[i].size(); j++) {
+					Card card = stacks.plateau[i].get(j);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
-							collisionDetected = true;
-							removeCard(c);
-							moveToNewStack(card, c);
+							if (c.rb.rankRule(c, card) && c.sb.suitRule(c, card)) {
+								collisionDetected = true;
+								removeCard(c);
+								moveToNewStack(card, c);
+							}
 						}
 				}
 			return collisionDetected;
@@ -366,18 +370,6 @@ public class GameStart extends Application {
 			return true;
 		return false;
 	}
-
-	// Comparison to see if above card is the right rank for movement
-	//Moved to facade
-
-	// Comparison to see if above card is the right suit for movement
-	//Moved to facade
-
-	// Comparison to see if above card is the right rank for movement
-	//Moved to facade
-
-	// Comparison to see if above card is the right suit for movement
-	//Moved to facade
 
 	// add cards stacks entities to board
 	public void addStacks() {
@@ -401,80 +393,76 @@ public class GameStart extends Application {
 
 	// Initially set up the Plateau
 	public void movePlateau() {
-		for (int a = 0; a < stacks.plateau.length; a++) {
-			stacks.plateau[a].get(0).setX(20 + HEIGHT * a);
-			stacks.plateau[a].get(0).setY(200 + 20 * (0 * 1.5));
-			stacks.plateau[a].get(0).setStroke(Color.BLACK);
-			stacks.plateau[a].get(0).setFill(Color.GREEN);
-			stacks.plateau[a].get(0).setArcWidth(10);
-			stacks.plateau[a].get(0).setArcHeight(10);
-			for (int i = 1; i < stacks.plateau[a].size(); i++) {
-				stacks.plateau[a].get(i).toFront();
-				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
-				stacks.plateau[a].get(i).setY(200 + 20 * ((i - 1) * 1.5));
-				stacks.plateau[a].get(i).setArcWidth(10);
-				stacks.plateau[a].get(i).setArcHeight(10);
-				stacks.plateau[a].get(i).attachBack();
-				if (i == stacks.plateau[a].size() - 1)
-					stacks.plateau[a].get(i).attachFace();
-				addEvent(stacks.plateau[a].get(i));
+		for (int i = 0; i < stacks.plateau.length; i++) {
+			stacks.plateau[i].get(0).setX(20 + HEIGHT * i);
+			stacks.plateau[i].get(0).setY(200 + 20 * (0 * 1.5));
+			stacks.plateau[i].get(0).setStroke(Color.BLACK);
+			stacks.plateau[i].get(0).setFill(Color.GREEN);
+			stacks.plateau[i].get(0).setArcWidth(10);
+			stacks.plateau[i].get(0).setArcHeight(10);
+			for (int j = 1; j < stacks.plateau[i].size(); j++) {
+				stacks.plateau[i].get(j).toFront();
+				stacks.plateau[i].get(j).setX(20 + HEIGHT * i);
+				stacks.plateau[i].get(j).setY(200 + 20 * ((j - 1) * 1.5));
+				stacks.plateau[i].get(j).setArcWidth(10);
+				stacks.plateau[i].get(j).setArcHeight(10);
+				stacks.plateau[i].get(j).attachBack();
+				if (j == stacks.plateau[i].size() - 1)
+					stacks.plateau[i].get(j).attachFace();
+				addEvent(stacks.plateau[i].get(j));
 			}
 		}
 	}
 
-	// Restack cards after one is moved
-	public void resetPlateau() {
-		for (int a = 0; a < stacks.plateau.length; a++) {
-			for (int i = 1; i < stacks.plateau[a].size(); i++) {
-				stacks.plateau[a].get(i).setX(20 + HEIGHT * a);
-				stacks.plateau[a].get(i).setY(200 + 20 * ((i - 1) * 1.5));
-			}
+	// Restack cards in stack after one is added
+	public void resetPlateau(int i) {
+		for (int j = 1; j < stacks.plateau[i].size(); j++) {
+			stacks.plateau[i].get(j).setX(20 + HEIGHT * i);
+			stacks.plateau[i].get(j).setY(200 + 20 * ((j - 1) * 1.5));
 		}
 	}
 
 	// Initalliy set up cache
 	public void moveCache() {
-		for (int a = 0; a < stacks.cache.length; a++) {
-			board.getChildren().addAll(stacks.cache[a]);
-			stacks.cache[a].get(0).setX(380 + 120 * a);
-			stacks.cache[a].get(0).setY(25);
-			stacks.cache[a].get(0).setArcWidth(10);
-			stacks.cache[a].get(0).setArcHeight(10);
-			stacks.cache[a].get(0).setStroke(Color.WHITESMOKE);
-			stacks.cache[a].get(0).setFill(Color.GREEN);
+		for (int i = 0; i < stacks.cache.length; i++) {
+			board.getChildren().addAll(stacks.cache[i]);
+			stacks.cache[i].get(0).setX(380 + 120 * i);
+			stacks.cache[i].get(0).setY(25);
+			stacks.cache[i].get(0).setArcWidth(10);
+			stacks.cache[i].get(0).setArcHeight(10);
+			stacks.cache[i].get(0).setStroke(Color.WHITESMOKE);
+			stacks.cache[i].get(0).setFill(Color.GREEN);
 		}
 	}
 
-	// Restack the cache
-	public void resetCache() {
-		for (int a = 0; a < stacks.cache.length; a++) {
-			for (int b = 1; b < stacks.cache[a].size(); b++) {
-				stacks.cache[a].get(b).toFront();
-				stacks.cache[a].get(b).isCache = true;
-				stacks.cache[a].get(b).setX(380 + 120 * a);
-				stacks.cache[a].get(b).setY(25);
-			}
+	// Restack the cache after one is added
+	public void resetCache(int i) {
+		for (int j = 1; j < stacks.cache[i].size(); j++) {
+			stacks.cache[i].get(j).toFront();
+			stacks.cache[i].get(j).isCache = true;
+			stacks.cache[i].get(j).setX(380 + 120 * i);
+			stacks.cache[i].get(j).setY(25);
 		}
 	}
 
 	// Initialize empty boxes on board
 	public void initializeBox(Rectangle[] r) {
-		for (int a = 0; a < r.length; a++) {
-			r[a] = new Rectangle();
-			if (a < 7) {
-				r[a].setX(20 + 120 * (a));
-				r[a].setY(200);
-				r[a].setStroke(Color.BLACK);
+		for (int i = 0; i < r.length; i++) {
+			r[i] = new Rectangle();
+			if (i < 7) {
+				r[i].setX(20 + 120 * (i));
+				r[i].setY(200);
+				r[i].setStroke(Color.BLACK);
 			} else {
-				r[a].setX(380 + 120 * (a - 7));
-				r[a].setY(25);
-				r[a].setStroke(Color.WHITESMOKE);
+				r[i].setX(380 + 120 * (i - 7));
+				r[i].setY(25);
+				r[i].setStroke(Color.WHITESMOKE);
 			}
-			r[a].setWidth(WIDTH);
-			r[a].setHeight(HEIGHT);
-			r[a].setArcWidth(10);
-			r[a].setArcHeight(10);
-			r[a].setFill(Color.GREEN);
+			r[i].setWidth(WIDTH);
+			r[i].setHeight(HEIGHT);
+			r[i].setArcWidth(10);
+			r[i].setArcHeight(10);
+			r[i].setFill(Color.GREEN);
 		}
 		// White box position for deck
 		r[11].setX(20);

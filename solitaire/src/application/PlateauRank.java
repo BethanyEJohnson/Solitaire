@@ -1,7 +1,7 @@
 package application;
 
-public class PlateauRank implements Check{
-	public boolean check(Card orig, Card top) {
+public class PlateauRank implements RankBehavior {
+	public boolean rankRule(Card orig, Card top) {
 		if (orig.rank == "A" && top.rank == "2")
 			return true;
 		if (orig.rank == "2" && top.rank == "3")

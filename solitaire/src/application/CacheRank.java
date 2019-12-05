@@ -1,7 +1,7 @@
 package application;
 
-public class CacheRank implements Check{
-	public boolean check(Card orig, Card top) {
+public class CacheRank implements RankBehavior {
+	public boolean rankRule(Card orig, Card top) {
 		if (orig.rank == "A" && top.rank == null)
 			return true;
 		if (orig.rank == "2" && top.rank == "A")
