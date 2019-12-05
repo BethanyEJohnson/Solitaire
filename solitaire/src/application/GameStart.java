@@ -341,7 +341,6 @@ public class GameStart extends Application {
 		if (c.isCache) {
 			c.rb = new PlateauRank();
 			c.sb = new PlateauSuit();
-			stackPrinter();
 			for (int i = 0; i < stacks.plateau.length; i++)
 				for (int j = 1; j < stacks.plateau[i].size(); j++) {
 					Card card = stacks.plateau[i].get(j);
