@@ -20,6 +20,7 @@ public class GameStart extends Application {
 	final int HEIGHT = cardEx.HEIGHT;
 	DeckOfCards dc;
 	Stacks stacks;
+	WinStatus win;
 
 	public static void main(String[] args) {
 		launch();
@@ -54,6 +55,7 @@ public class GameStart extends Application {
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
 				stacks = new Stacks(dc);
+				win = new WinStatus(stacks);
 				// Set up cards on the board
 				moveDeck();
 				addStacks();
@@ -151,7 +153,7 @@ public class GameStart extends Application {
 		c.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent t) {
-				WinStatus win = new WinStatus(stacks);
+				win.update(stacks);
 
 				if (c.isFaceUp) {
 					// Check if cards has cards underneath in stack
@@ -180,7 +182,7 @@ public class GameStart extends Application {
 							}
 					}
 					c.hasChildren = false;
-					win.update();
+					win.display();
 				}
 			}
 		});
