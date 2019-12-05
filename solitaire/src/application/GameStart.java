@@ -266,8 +266,6 @@ public class GameStart extends Application {
 			// King to Empty Stack
 			if (c.rank == "K") {
 				for (int i = 0; i < stacks.plateau.length; i++) {
-					c.rb = new PlateauRank();
-					c.sb = new PlateauSuit();
 					Card card = stacks.plateau[i].get(0);
 					if (cIntersect(c, card) && stacks.plateau[i].size() == 1 && distanceCheck(c, card)) {
 						collisionDetected = true;
@@ -295,9 +293,7 @@ public class GameStart extends Application {
 					Card card = stacks.plateau[i].get(j);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
-							c.rb = new PlateauRank();
-							c.sb = new PlateauSuit();
-							if (c.rb.rankRule(c, card) && c.sb.suitRule(c, card)) {
+							if (c.rb.plateauRank(c, card) && c.sb.plateauSuit(c, card)) {
 								collisionDetected = true;
 								if (!c.isDeck) {
 									removeCard(c);
@@ -322,9 +318,8 @@ public class GameStart extends Application {
 				for (int j = 0; j < stacks.cache[i].size(); j++) {
 					Card card = stacks.cache[i].get(j);
 					if (cIntersect(c, card) && distanceCheck(c, card) && !c.hasChildren && c != card) {
-						c.rb = new CacheRank();
-						c.sb = new CacheSuit();
-						if (c.rb.rankRule(c, card) && c.sb.suitRule(c, card)) {
+						System.out.println(c.rb);
+						if (c.rb.cacheRank(c, card) && c.sb.cacheSuit(c, card)) {
 							collisionDetected = true;
 							if (c.isDeck) {
 								c.isDeck = false;
@@ -339,14 +334,12 @@ public class GameStart extends Application {
 
 		// Cache ---> Plateau
 		if (c.isCache) {
-			c.rb = new PlateauRank();
-			c.sb = new PlateauSuit();
 			for (int i = 0; i < stacks.plateau.length; i++)
 				for (int j = 1; j < stacks.plateau[i].size(); j++) {
 					Card card = stacks.plateau[i].get(j);
 					if (card != c && card.isFaceUp && !card.isDeck)
 						if (cIntersect(c, card) && distanceCheck(c, card) && c != card) {
-							if (c.rb.rankRule(c, card) && c.sb.suitRule(c, card)) {
+							if (c.rb.plateauRank(c, card) && c.sb.plateauSuit(c, card)) {
 								collisionDetected = true;
 								removeCard(c);
 								moveToNewStack(card, c);

@@ -7,12 +7,11 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 public class Card extends Rectangle {
+	String suit;
+	String rank;
 	//Behaviors for card rank and suit
 	RankBehavior rb;
 	SuitBehavior sb;
-
-	String suit;
-	String rank;
 	// boolean value to determine if card is face up
 	boolean isFaceUp;
 	// boolean value to check if a card is a part of the deck(top left)
@@ -37,9 +36,11 @@ public class Card extends Rectangle {
 	}
 
 	// Constructor
-	public Card(String suit, String rank) {
+	public Card(String suit, String rank, RankBehavior rb, SuitBehavior sb) {
 		this.suit = suit;
 		this.rank = rank;
+		this.rb = rb;
+		this.sb = sb;
 		this.setWidth(WIDTH);
 		this.setHeight(HEIGHT);
 		attachBack();
