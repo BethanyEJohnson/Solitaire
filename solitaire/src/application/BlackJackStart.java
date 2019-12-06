@@ -1,6 +1,6 @@
 package application;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -19,8 +19,8 @@ public class BlackJackStart implements Game {
 	DeckOfCards dc;
 	int deckPos = 0;
 	// Lists of cards for player and house
-	ArrayList<Card> hHand;
-	ArrayList<Card> pHand;
+	LinkedList<Card> hHand;
+	LinkedList<Card> pHand;
 
 	public void start(Stage primaryStage) throws Exception {
 		board = new Pane();
@@ -28,8 +28,8 @@ public class BlackJackStart implements Game {
 		Button newGame = new Button("New Game");
 
 		// Initialize pHand and hHand
-		pHand = new ArrayList<Card>();
-		hHand = new ArrayList<Card>();
+		pHand = new LinkedList<Card>();
+		hHand = new LinkedList<Card>();
 
 		// The button to add a card to your stack
 		hit = new Button("Hit");
@@ -108,7 +108,7 @@ public class BlackJackStart implements Game {
 				buttonVisibility();
 				// deal card to player and to the house
 				houseCards();
-				myCards();
+				PlayerCards();
 			}
 		});
 		two.setOnAction(new EventHandler<ActionEvent>() {
@@ -123,7 +123,7 @@ public class BlackJackStart implements Game {
 				buttonVisibility();
 				// deal card to player and to the house
 				houseCards();
-				myCards();
+				PlayerCards();
 			}
 		});
 	}
@@ -134,37 +134,65 @@ public class BlackJackStart implements Game {
 		hit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// deal card to player and to the house
-				houseCards();
-				myCards();
+				addCardToPlayer();
 				if (handValueCounter(pHand) > 21) {
-					// Lose
+					//// Lose message
 					buttonVisibility();
 				} else if (handValueCounter(pHand) == 21) {
-					// enable House to fill hand up
+					addCardToHouse();
+					buttonVisibility();
+					if(handValueCounter(hHand) < handValueCounter(pHand)) {
+						//// Win message
+					}
 				}
 			}
 		});
 		stand.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-
+				hHand.get(0).attachFace();
+				addCardToHouse();
 				buttonVisibility();
 
+				if(handValueCounter(hHand) < handValueCounter(pHand)) {
+					//// Win message
+				}
 			}
 		});
 	}
 
+	// Adds cards to the house hand to try to beat what the player has
 	public void addCardToHouse() {
-
+		System.out.println(handValueCounter(pHand));
+		while (handValueCounter(hHand) < handValueCounter(pHand) && handValueCounter(hHand) < 21) {
+			System.out.println("here");
+			pHand.add(dc.Cards[deckPos]);
+			pHand.getLast().setVisible(true);
+			pHand.getLast().toFront();
+			pHand.getLast().attachFace();
+			pHand.getLast().setArcWidth(10);
+			pHand.getLast().setArcHeight(10);
+			pHand.getLast().setX(105 + 35 * (pHand.size() - 1));
+			pHand.getLast().setY(105);
+			deckPos++;
+		}
 	}
 
+	// Add card to player hand
 	public void addCardToPlayer() {
 		pHand.add(dc.Cards[deckPos]);
+		System.out.println(hHand.size());
+		pHand.getLast().setVisible(true);
+		pHand.getLast().toFront();
+		pHand.getLast().attachFace();
+		pHand.getLast().setArcWidth(10);
+		pHand.getLast().setArcHeight(10);
+		pHand.getLast().setX(105 + 35 * (pHand.size() - 1));
+		pHand.getLast().setY(405);
 		deckPos++;
 	}
 
-	public int handValueCounter(ArrayList<Card> hand) {
+	public int handValueCounter(LinkedList<Card> hand) {
 		int value = 0;
 		for (int a = 0; a < hand.size(); a++) {
 			value = rankToInt(hand.get(a));
@@ -227,7 +255,7 @@ public class BlackJackStart implements Game {
 	}
 
 	// This deals the two cards for the player
-	public void myCards() {
+	public void PlayerCards() {
 		pHand.add(dc.Cards[49]);
 		pHand.add(dc.Cards[48]);
 		pHand.get(0).setVisible(true);
