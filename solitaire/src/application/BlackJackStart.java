@@ -135,13 +135,13 @@ public class BlackJackStart implements Game {
 			@Override
 			public void handle(ActionEvent event) {
 				addCardToPlayer();
-				if (handValueCounter(pHand) > 21) {
+				if (handValueCounter(pHand, pHand.size()) > 21) {
 					//// Lose message
 					buttonVisibility();
-				} else if (handValueCounter(pHand) == 21) {
+				} else if (handValueCounter(pHand, pHand.size()) == 21) {
 					addCardToHouse();
 					buttonVisibility();
-					if(handValueCounter(hHand) < handValueCounter(pHand)) {
+					if (handValueCounter(hHand, hHand.size()) < handValueCounter(pHand, pHand.size())) {
 						//// Win message
 					}
 				}
@@ -154,7 +154,7 @@ public class BlackJackStart implements Game {
 				addCardToHouse();
 				buttonVisibility();
 
-				if(handValueCounter(hHand) < handValueCounter(pHand)) {
+				if (handValueCounter(hHand, hHand.size()) < handValueCounter(pHand, pHand.size())) {
 					//// Win message
 				}
 			}
@@ -163,16 +163,15 @@ public class BlackJackStart implements Game {
 
 	// Adds cards to the house hand to try to beat what the player has
 	public void addCardToHouse() {
-		System.out.println(handValueCounter(pHand));
-		while (handValueCounter(hHand) < handValueCounter(pHand) && handValueCounter(hHand) < 21) {
-			System.out.println("here");
+		while (handValueCounter(hHand, hHand.size()) < handValueCounter(pHand, pHand.size()) && handValueCounter(hHand, hHand.size()) < 21
+				&& handValueCounter(pHand, pHand.size()) < 22 && handValueCounter(hHand, hHand.size()) != handValueCounter(pHand, pHand.size())) {
 			pHand.add(dc.Cards[deckPos]);
 			pHand.getLast().setVisible(true);
 			pHand.getLast().toFront();
 			pHand.getLast().attachFace();
 			pHand.getLast().setArcWidth(10);
 			pHand.getLast().setArcHeight(10);
-			pHand.getLast().setX(105 + 35 * (pHand.size() - 1));
+			pHand.getLast().setX(105 + 35 * (hHand.size() - 1));
 			pHand.getLast().setY(105);
 			deckPos++;
 		}
@@ -181,7 +180,6 @@ public class BlackJackStart implements Game {
 	// Add card to player hand
 	public void addCardToPlayer() {
 		pHand.add(dc.Cards[deckPos]);
-		System.out.println(hHand.size());
 		pHand.getLast().setVisible(true);
 		pHand.getLast().toFront();
 		pHand.getLast().attachFace();
@@ -192,9 +190,19 @@ public class BlackJackStart implements Game {
 		deckPos++;
 	}
 
-	public int handValueCounter(LinkedList<Card> hand) {
+	public void playerPrinter() {
+		int a = 0;
+		while (pHand.get(a) != null) {
+			System.out.println(a);
+			a++;
+		}
+		System.out.println(a);
+	}
+
+	// Counts value of passed linked list cards
+	public int handValueCounter(LinkedList<Card> hand, int size) {
 		int value = 0;
-		for (int a = 0; a < hand.size(); a++) {
+		for (int a = 0; a < size; a++) {
 			value = rankToInt(hand.get(a));
 		}
 		return value;
