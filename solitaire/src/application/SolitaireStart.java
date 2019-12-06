@@ -54,6 +54,7 @@ public class SolitaireStart extends Application {
 				});
 				// Make a deck of cards and the stacks
 				dc = DeckOfCards.getInstance();
+				dc.shuffle(dc.Cards);
 				stacks = new Stacks(dc);
 				win = new WinStatus(stacks);
 				// Set up cards on the board

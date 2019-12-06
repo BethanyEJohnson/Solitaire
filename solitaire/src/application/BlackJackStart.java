@@ -10,14 +10,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class BlackJackStart implements Game{
+public class BlackJackStart implements Game {
 	Pane board = new Pane();
 	Card cardEx = new Card();
-	Button hit, one, two, three, stand;
+	Button hit, one, two, stand;
 	final int WIDTH = cardEx.WIDTH;
 	final int HEIGHT = cardEx.HEIGHT;
 	DeckOfCards dc;
-	WinStatus win;
 	// Lists of cards for player and house
 	ArrayList<Card> hHand;
 	ArrayList<Card> pHand;
@@ -26,45 +25,48 @@ public class BlackJackStart implements Game{
 		board = new Pane();
 		board.setStyle("-fx-background-color: green");
 		Button newGame = new Button("New Game");
+		
+		// Initialize pHand and hHand
+		pHand = new ArrayList<Card>();
+		hHand = new ArrayList<Card>();
+		
 		// The button to add a card to your stack
 		hit = new Button("Hit");
-		// The button to bet one dollar
+
+		// Initializing buttons
 		one = new Button("Bet $1");
 		two = new Button("Bet $2");
-		three = new Button("Bet $3");
 		stand = new Button("Stand");
+		// Adds events to buttons
+		setUpBetButtons();
+
+		// Initializing empty boxes on board
 		Rectangle[] boxes = new Rectangle[2];
+
+		// Sets up the position of the buttons on the scren
 		hit.setLayoutX(10);
 		hit.setLayoutY(400);
 		one.setLayoutX(10);
 		one.setLayoutY(250);
 		two.setLayoutX(10);
 		two.setLayoutY(300);
-		three.setLayoutX(10);
-		three.setLayoutY(350);
 		stand.setLayoutX(10);
 		stand.setLayoutY(450);
-		one.setVisible(false);
-		two.setVisible(false);
-		three.setVisible(false);
-		
+		hit.setVisible(false);
+		stand.setVisible(false);
+
 		// Button to start game
 		newGame.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// Initialize pHand and hHand
-				pHand = new ArrayList<Card>();
-				hHand = new ArrayList<Card>();
 				// Get one instance of deck of cards
 				dc = DeckOfCards.getInstance();
-				buttonVisibility();
 				initializeBox(boxes);
 				newGame.setVisible(true);
 				board.getChildren().clear();
-				board.getChildren().addAll(newGame, hit, one, two, three, stand, boxes[0], boxes[1]);
-				// deal card to player and to the house
-				houseCards();
-				myCards();
+				// Adds all buttons, boxes, and cards to board
+				board.getChildren().addAll(newGame, hit, one, two, stand, boxes[0], boxes[1]);
+				addCardsToBoard();
 			}
 		});
 
@@ -79,11 +81,52 @@ public class BlackJackStart implements Game{
 		primaryStage.show();
 	}
 
+	// Adds all cards to board and make them not visible
+	public void addCardsToBoard() {
+		board.getChildren().addAll(dc.Cards);
+		for(int a = 0; a < 52; a++)
+			dc.Cards[a].setVisible(false);
+	}
+
+	// Event for the betting buttons one, two, and three
+	// wanted to implement a way to keep track of money
+	public void setUpBetButtons() {
+		one.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// take cards from both player and house on board
+				pHand.clear();
+				hHand.clear();
+				// Shuffle Deck each hand
+				dc.shuffle(dc.Cards);
+				buttonVisibility();
+				// deal card to player and to the house
+				houseCards();
+				myCards();
+			}
+		});
+		two.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// take cards from both player and house on board
+				pHand.clear();
+				hHand.clear();
+				// Shuffle Deck each hand
+				dc.shuffle(dc.Cards);
+				buttonVisibility();
+				// deal card to player and to the house
+				houseCards();
+				myCards();
+			}
+		});
+	}
+
 	// This deals the two cards for the house
 	public void houseCards() {
-		board.getChildren().addAll(dc.Cards[51], dc.Cards[50]);
 		hHand.add(dc.Cards[51]);
 		hHand.add(dc.Cards[50]);
+		hHand.get(0).setVisible(true);
+		hHand.get(1).setVisible(true);
 		hHand.get(0).attachBack();
 		hHand.get(0).setArcWidth(10);
 		hHand.get(0).setArcHeight(10);
@@ -96,12 +139,13 @@ public class BlackJackStart implements Game{
 		hHand.get(1).setX(140);
 		hHand.get(1).setY(105);
 	}
-	
+
 	// This deals the two cards for the player
 	public void myCards() {
-		board.getChildren().addAll(dc.Cards[49], dc.Cards[48]);
 		pHand.add(dc.Cards[49]);
 		pHand.add(dc.Cards[48]);
+		pHand.get(0).setVisible(true);
+		pHand.get(1).setVisible(true);
 		pHand.get(0).attachFace();
 		pHand.get(0).setArcWidth(10);
 		pHand.get(0).setArcHeight(10);
@@ -114,16 +158,20 @@ public class BlackJackStart implements Game{
 		pHand.get(1).setX(140);
 		pHand.get(1).setY(405);
 	}
-	
+
 	// Set button visibility
 	public void buttonVisibility() {
-		if (!one.isVisible() && !two.isVisible() && !three.isVisible()) {
+		if (one.isVisible() && two.isVisible()) {
 			hit.setVisible(true);
 			stand.setVisible(true);
-		} else {
+			one.setVisible(false);
+			two.setVisible(false);
+		}
+		else if (hit.isVisible() && stand.isVisible()) {
+			hit.setVisible(false);
+			stand.setVisible(false);
 			one.setVisible(true);
 			two.setVisible(true);
-			three.setVisible(true);
 		}
 	}
 

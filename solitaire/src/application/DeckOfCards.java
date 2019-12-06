@@ -22,10 +22,10 @@ public class DeckOfCards {
 			dc = new DeckOfCards();
 		}
 		cleanCards(dc.Cards);
-		shuffle(dc.Cards);
 		return dc;
 	}
 	
+	// Reset boolean values on all cards
 	public static void cleanCards(Card[] C) {
 		for (int a = 0; a < 52; a++) {
 			C[a].hasChildren = false;
@@ -46,7 +46,7 @@ public class DeckOfCards {
 	}
 
 	// shuffles the deck of cards
-	public static Card[] shuffle(Card[] C) {
+	public Card[] shuffle(Card[] C) {
 		List<Card> list = Arrays.asList(C);
 		Collections.shuffle(list);
 		return (Card[]) list.toArray();
