@@ -18,10 +18,10 @@ public class MainMenu extends Application {
 		Pane board = new Pane();
 		Scene mainScene = new Scene(board, 300, 300);
 		Button blackJack = new Button("Play BlackJack");
-		blackJack.setLayoutX(120);
+		blackJack.setLayoutX(100);
 		blackJack.setLayoutY(100);
 		Button solitaire = new Button("Play Solitaire");
-		solitaire.setLayoutX(120);
+		solitaire.setLayoutX(100);
 		solitaire.setLayoutY(140);
 		board.getChildren().addAll(blackJack, solitaire);
 		// add to stage

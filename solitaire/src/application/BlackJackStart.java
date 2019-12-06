@@ -1,5 +1,6 @@
 package application;
 
+import java.util.ArrayList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -17,6 +18,9 @@ public class BlackJackStart implements Game{
 	final int HEIGHT = cardEx.HEIGHT;
 	DeckOfCards dc;
 	WinStatus win;
+	// Lists of cards for player and house
+	ArrayList<Card> hHand;
+	ArrayList<Card> pHand;
 
 	public void start(Stage primaryStage) throws Exception {
 		board = new Pane();
@@ -48,15 +52,19 @@ public class BlackJackStart implements Game{
 		newGame.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				// Initialize pHand and hHand
+				pHand = new ArrayList<Card>();
+				hHand = new ArrayList<Card>();
+				// Get one instance of deck of cards
+				dc = DeckOfCards.getInstance();
 				buttonVisibility();
 				initializeBox(boxes);
 				newGame.setVisible(true);
 				board.getChildren().clear();
 				board.getChildren().addAll(newGame, hit, one, two, three, stand, boxes[0], boxes[1]);
-
-				// Make a deck of cards and the stacks
-				dc = DeckOfCards.getInstance();
-
+				// deal card to player and to the house
+				houseCards();
+				myCards();
 			}
 		});
 
@@ -71,6 +79,42 @@ public class BlackJackStart implements Game{
 		primaryStage.show();
 	}
 
+	// This deals the two cards for the house
+	public void houseCards() {
+		board.getChildren().addAll(dc.Cards[51], dc.Cards[50]);
+		hHand.add(dc.Cards[51]);
+		hHand.add(dc.Cards[50]);
+		hHand.get(0).attachBack();
+		hHand.get(0).setArcWidth(10);
+		hHand.get(0).setArcHeight(10);
+		hHand.get(0).setX(105);
+		hHand.get(0).setY(105);
+		hHand.get(1).toFront();
+		hHand.get(1).attachFace();
+		hHand.get(1).setArcWidth(10);
+		hHand.get(1).setArcHeight(10);
+		hHand.get(1).setX(140);
+		hHand.get(1).setY(105);
+	}
+	
+	// This deals the two cards for the player
+	public void myCards() {
+		board.getChildren().addAll(dc.Cards[49], dc.Cards[48]);
+		pHand.add(dc.Cards[49]);
+		pHand.add(dc.Cards[48]);
+		pHand.get(0).attachFace();
+		pHand.get(0).setArcWidth(10);
+		pHand.get(0).setArcHeight(10);
+		pHand.get(0).setX(105);
+		pHand.get(0).setY(405);
+		pHand.get(1).toFront();
+		pHand.get(1).attachFace();
+		pHand.get(1).setArcWidth(10);
+		pHand.get(1).setArcHeight(10);
+		pHand.get(1).setX(140);
+		pHand.get(1).setY(405);
+	}
+	
 	// Set button visibility
 	public void buttonVisibility() {
 		if (!one.isVisible() && !two.isVisible() && !three.isVisible()) {
@@ -97,7 +141,7 @@ public class BlackJackStart implements Game{
 				r[i].setStroke(Color.WHITESMOKE);
 			}
 			r[i].setWidth(400);
-			r[i].setHeight(200);
+			r[i].setHeight(130);
 			r[i].setArcWidth(10);
 			r[i].setArcHeight(10);
 			r[i].setFill(Color.GREEN);
