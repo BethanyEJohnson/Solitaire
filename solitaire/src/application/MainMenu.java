@@ -9,6 +9,9 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class MainMenu extends Application {
+	SolitaireStart s;
+	BlackJackStart b;
+	
 	public static void main(String[] args) {
 		launch();
 	}
@@ -31,7 +34,7 @@ public class MainMenu extends Application {
 		blackJack.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				BlackJackStart b = new BlackJackStart();
+				b = new BlackJackStart();
 				try {
 					b.start(primaryStage);
 				} catch (Exception e) {
@@ -42,7 +45,7 @@ public class MainMenu extends Application {
 		solitaire.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				SolitaireStart s = new SolitaireStart();
+				s = new SolitaireStart();
 				try {
 					s.start(primaryStage);
 				} catch (Exception e) {

@@ -2,7 +2,6 @@ package application;
 
 import javafx.geometry.Point2D;
 import java.lang.Math;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.Pane;
@@ -13,7 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 
-public class SolitaireStart extends Application {
+public class SolitaireStart implements Game {
 	Pane board = new Pane();
 	Card cardEx = new Card();
 	final int WIDTH = cardEx.WIDTH;
@@ -21,10 +20,6 @@ public class SolitaireStart extends Application {
 	DeckOfCards dc;
 	Stacks stacks;
 	WinStatus win;
-
-	public void startGame() {
-		launch();
-	}
 	
 	// Setup Game
 	public void start(Stage primaryStage) throws Exception {
