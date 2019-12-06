@@ -20,7 +20,7 @@ public class SolitaireStart implements Game {
 	DeckOfCards dc;
 	Stacks stacks;
 	WinStatus win;
-	
+
 	// Setup Game
 	public void start(Stage primaryStage) throws Exception {
 		board = new Pane();
@@ -177,7 +177,11 @@ public class SolitaireStart implements Game {
 							}
 					}
 					c.hasChildren = false;
-					win.displaySolitaire();
+					try {
+						win.displaySolitaire();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});

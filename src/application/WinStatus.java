@@ -15,7 +15,7 @@ public class WinStatus {
 	}
 
 	// check win for solitaire
-	public void displaySolitaire() {
+	public void displaySolitaire() throws Exception {
 		cardsInCache = 0;
 		// int cardsInCache = 0;
 		for (int a = 0; a < this.stacks.cache.length; a++)
@@ -23,6 +23,7 @@ public class WinStatus {
 		// 52 cards in Deck and 4 empty cards to hold place of cache
 		if (cardsInCache == 56) {
 			win = new YouWin();
+			win.start();
 		}
 		else {
 			System.out.println("Current cards in stack: " + (cardsInCache - 4));
