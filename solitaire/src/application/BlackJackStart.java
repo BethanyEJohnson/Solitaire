@@ -17,6 +17,7 @@ public class BlackJackStart implements Game {
 	final int WIDTH = cardEx.WIDTH;
 	final int HEIGHT = cardEx.HEIGHT;
 	DeckOfCards dc;
+	int deckPos = 0;
 	// Lists of cards for player and house
 	ArrayList<Card> hHand;
 	ArrayList<Card> pHand;
@@ -25,11 +26,11 @@ public class BlackJackStart implements Game {
 		board = new Pane();
 		board.setStyle("-fx-background-color: green");
 		Button newGame = new Button("New Game");
-		
+
 		// Initialize pHand and hHand
 		pHand = new ArrayList<Card>();
 		hHand = new ArrayList<Card>();
-		
+
 		// The button to add a card to your stack
 		hit = new Button("Hit");
 
@@ -37,8 +38,12 @@ public class BlackJackStart implements Game {
 		one = new Button("Bet $1");
 		two = new Button("Bet $2");
 		stand = new Button("Stand");
-		// Adds events to buttons
+
+		// Adds events to betting buttons
 		setUpBetButtons();
+
+		// Adds events to game buttons
+		setUpGameButtons();
 
 		// Initializing empty boxes on board
 		Rectangle[] boxes = new Rectangle[2];
@@ -84,12 +89,12 @@ public class BlackJackStart implements Game {
 	// Adds all cards to board and make them not visible
 	public void addCardsToBoard() {
 		board.getChildren().addAll(dc.Cards);
-		for(int a = 0; a < 52; a++)
+		for (int a = 0; a < 52; a++)
 			dc.Cards[a].setVisible(false);
 	}
 
-	// Event for the betting buttons one, two, and three
-	// wanted to implement a way to keep track of money
+	// Event for the betting buttons one and two
+	// wanted to implement a way to keep track of money //
 	public void setUpBetButtons() {
 		one.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -98,6 +103,7 @@ public class BlackJackStart implements Game {
 				pHand.clear();
 				hHand.clear();
 				// Shuffle Deck each hand
+				deckPos = 0;
 				dc.shuffle(dc.Cards);
 				buttonVisibility();
 				// deal card to player and to the house
@@ -112,6 +118,7 @@ public class BlackJackStart implements Game {
 				pHand.clear();
 				hHand.clear();
 				// Shuffle Deck each hand
+				deckPos = 0;
 				dc.shuffle(dc.Cards);
 				buttonVisibility();
 				// deal card to player and to the house
@@ -119,6 +126,85 @@ public class BlackJackStart implements Game {
 				myCards();
 			}
 		});
+	}
+
+	// Setup buttons to add card to your stack and buttons to stand when you don't
+	// want anymore cards
+	public void setUpGameButtons() {
+		hit.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// deal card to player and to the house
+				houseCards();
+				myCards();
+				if (handValueCounter(pHand) > 21) {
+					// Lose
+					buttonVisibility();
+				} else if (handValueCounter(pHand) == 21) {
+					// enable House to fill hand up
+				}
+			}
+		});
+		stand.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+
+				buttonVisibility();
+
+			}
+		});
+	}
+
+	public void addCardToHouse() {
+
+	}
+
+	public void addCardToPlayer() {
+		pHand.add(dc.Cards[deckPos]);
+		deckPos++;
+	}
+
+	public int handValueCounter(ArrayList<Card> hand) {
+		int value = 0;
+		for (int a = 0; a < hand.size(); a++) {
+			value = rankToInt(hand.get(a));
+		}
+		return value;
+	}
+
+	// Gets a numerical value corresponding to a card rank
+	public int rankToInt(Card c) {
+		if (c.rank.equals("A")) {
+			return 1;
+		}
+		if (c.rank.equals("2")) {
+			return 2;
+		}
+		if (c.rank.equals("3")) {
+			return 3;
+		}
+		if (c.rank.equals("4")) {
+			return 4;
+		}
+		if (c.rank.equals("5")) {
+			return 5;
+		}
+		if (c.rank.equals("6")) {
+			return 6;
+		}
+		if (c.rank.equals("7")) {
+			return 7;
+		}
+		if (c.rank.equals("8")) {
+			return 8;
+		}
+		if (c.rank.equals("9")) {
+			return 9;
+		}
+		if (c.rank.equals("10") || c.rank.equals("J") || c.rank.equals("Q") || c.rank.equals("K")) {
+			return 10;
+		} else
+			return 0;
 	}
 
 	// This deals the two cards for the house
@@ -166,8 +252,7 @@ public class BlackJackStart implements Game {
 			stand.setVisible(true);
 			one.setVisible(false);
 			two.setVisible(false);
-		}
-		else if (hit.isVisible() && stand.isVisible()) {
+		} else if (hit.isVisible() && stand.isVisible()) {
 			hit.setVisible(false);
 			stand.setVisible(false);
 			one.setVisible(true);
