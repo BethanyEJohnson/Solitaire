@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class BlackJackStart implements Game {
@@ -21,6 +23,10 @@ public class BlackJackStart implements Game {
 	// Lists of cards for player and house
 	LinkedList<Card> hHand;
 	LinkedList<Card> pHand;
+	// Value of all cards in player and house hand
+	int pNumber, hNumber;
+	// Text box for when user wins or loses
+	Text t;
 
 	public void start(Stage primaryStage) throws Exception {
 		board = new Pane();
@@ -30,6 +36,10 @@ public class BlackJackStart implements Game {
 		// Initialize pHand and hHand
 		pHand = new LinkedList<Card>();
 		hHand = new LinkedList<Card>();
+
+		// Initialize numbers
+		pNumber = 0;
+		hNumber = 0;
 
 		// The button to add a card to your stack
 		hit = new Button("Hit");
@@ -60,6 +70,13 @@ public class BlackJackStart implements Game {
 		hit.setVisible(false);
 		stand.setVisible(false);
 
+		t = new Text();
+		t.setText("test");
+		t.setLayoutX(100);
+		t.setLayoutX(100);
+		t.setFont(new Font(20));
+		t.setFill(Color.RED);
+		t.toFront();
 		// Button to start game
 		newGame.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -70,8 +87,8 @@ public class BlackJackStart implements Game {
 				newGame.setVisible(true);
 				board.getChildren().clear();
 				// Adds all buttons, boxes, and cards to board
-				board.getChildren().addAll(newGame, hit, one, two, stand, boxes[0], boxes[1]);
-				addCardsToBoard();
+				board.getChildren().addAll(newGame, hit, one, two, stand, boxes[0], boxes[1], t);
+				adjustVisibility();
 			}
 		});
 
@@ -86,8 +103,9 @@ public class BlackJackStart implements Game {
 		primaryStage.show();
 	}
 
-	// Adds all cards to board and make them not visible
-	public void addCardsToBoard() {
+	// For setting up and resetting the cards on the board
+	public void adjustVisibility() {
+		board.getChildren().removeAll(dc.Cards);
 		board.getChildren().addAll(dc.Cards);
 		for (int a = 0; a < 52; a++)
 			dc.Cards[a].setVisible(false);
@@ -99,6 +117,10 @@ public class BlackJackStart implements Game {
 		one.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				adjustVisibility();
+				// Set hand values back to zero
+				pNumber = 0;
+				hNumber = 0;
 				// take cards from both player and house on board
 				pHand.clear();
 				hHand.clear();
@@ -114,6 +136,10 @@ public class BlackJackStart implements Game {
 		two.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				adjustVisibility();
+				// Set hand values back to zero
+				pNumber = 0;
+				hNumber = 0;
 				// take cards from both player and house on board
 				pHand.clear();
 				hHand.clear();
@@ -135,14 +161,18 @@ public class BlackJackStart implements Game {
 			@Override
 			public void handle(ActionEvent event) {
 				addCardToPlayer();
-				if (handValueCounter(pHand, pHand.size()) > 21) {
+				if (pNumber > 21) {
 					//// Lose message
+					System.out.println("you lose");
+					hHand.get(0).attachFace();
 					buttonVisibility();
-				} else if (handValueCounter(pHand, pHand.size()) == 21) {
+				} else if (pNumber == 21) {
+					hHand.get(0).attachFace();
 					addCardToHouse();
 					buttonVisibility();
-					if (handValueCounter(hHand, hHand.size()) < handValueCounter(pHand, pHand.size())) {
+					if (hNumber < pNumber) {
 						//// Win message
+						System.out.println("you win");
 					}
 				}
 			}
@@ -154,8 +184,9 @@ public class BlackJackStart implements Game {
 				addCardToHouse();
 				buttonVisibility();
 
-				if (handValueCounter(hHand, hHand.size()) < handValueCounter(pHand, pHand.size())) {
+				if (hNumber < pNumber) {
 					//// Win message
+					System.out.println("you win");
 				}
 			}
 		});
@@ -163,16 +194,16 @@ public class BlackJackStart implements Game {
 
 	// Adds cards to the house hand to try to beat what the player has
 	public void addCardToHouse() {
-		while (handValueCounter(hHand, hHand.size()) < handValueCounter(pHand, pHand.size()) && handValueCounter(hHand, hHand.size()) < 21
-				&& handValueCounter(pHand, pHand.size()) < 22 && handValueCounter(hHand, hHand.size()) != handValueCounter(pHand, pHand.size())) {
-			pHand.add(dc.Cards[deckPos]);
-			pHand.getLast().setVisible(true);
-			pHand.getLast().toFront();
-			pHand.getLast().attachFace();
-			pHand.getLast().setArcWidth(10);
-			pHand.getLast().setArcHeight(10);
-			pHand.getLast().setX(105 + 35 * (hHand.size() - 1));
-			pHand.getLast().setY(105);
+		while (hNumber < pNumber && hNumber < 21 && pNumber < 22 && hNumber != pNumber) {
+			hHand.add(dc.Cards[deckPos]);
+			hNumber += rankToInt(hHand.getLast());
+			hHand.getLast().setVisible(true);
+			hHand.getLast().toFront();
+			hHand.getLast().attachFace();
+			hHand.getLast().setArcWidth(10);
+			hHand.getLast().setArcHeight(10);
+			hHand.getLast().setX(105 + 35 * (hHand.size() - 1));
+			hHand.getLast().setY(105);
 			deckPos++;
 		}
 	}
@@ -180,6 +211,7 @@ public class BlackJackStart implements Game {
 	// Add card to player hand
 	public void addCardToPlayer() {
 		pHand.add(dc.Cards[deckPos]);
+		pNumber += rankToInt(pHand.getLast());
 		pHand.getLast().setVisible(true);
 		pHand.getLast().toFront();
 		pHand.getLast().attachFace();
@@ -190,52 +222,19 @@ public class BlackJackStart implements Game {
 		deckPos++;
 	}
 
-	public void playerPrinter() {
-		int a = 0;
-		while (pHand.get(a) != null) {
-			System.out.println(a);
-			a++;
-		}
-		System.out.println(a);
-	}
-
-	// Counts value of passed linked list cards
-	public int handValueCounter(LinkedList<Card> hand, int size) {
-		int value = 0;
-		for (int a = 0; a < size; a++) {
-			value = rankToInt(hand.get(a));
-		}
-		return value;
-	}
-
 	// Gets a numerical value corresponding to a card rank
 	public int rankToInt(Card c) {
 		if (c.rank.equals("A")) {
-			return 1;
+			if (pNumber < 11)
+				return 11;
+			if (hNumber < 11)
+				return 11;
+			else
+				return 1;
 		}
-		if (c.rank.equals("2")) {
-			return 2;
-		}
-		if (c.rank.equals("3")) {
-			return 3;
-		}
-		if (c.rank.equals("4")) {
-			return 4;
-		}
-		if (c.rank.equals("5")) {
-			return 5;
-		}
-		if (c.rank.equals("6")) {
-			return 6;
-		}
-		if (c.rank.equals("7")) {
-			return 7;
-		}
-		if (c.rank.equals("8")) {
-			return 8;
-		}
-		if (c.rank.equals("9")) {
-			return 9;
+		if (c.rank.equals("2") || c.rank.equals("3") || c.rank.equals("4") || c.rank.equals("5") || c.rank.equals("6")
+				|| c.rank.equals("7") || c.rank.equals("8") || c.rank.equals("9")) {
+			return Integer.parseInt(c.rank);
 		}
 		if (c.rank.equals("10") || c.rank.equals("J") || c.rank.equals("Q") || c.rank.equals("K")) {
 			return 10;
@@ -245,40 +244,34 @@ public class BlackJackStart implements Game {
 
 	// This deals the two cards for the house
 	public void houseCards() {
-		hHand.add(dc.Cards[51]);
-		hHand.add(dc.Cards[50]);
-		hHand.get(0).setVisible(true);
-		hHand.get(1).setVisible(true);
+		for (int i = 0; i < 2; i++) {
+			hHand.add(dc.Cards[51 - i]);
+			hHand.get(i).setVisible(true);
+			hHand.get(i).setArcWidth(10);
+			hHand.get(i).setArcHeight(10);
+			hHand.get(i).setX(105 + 35 * i);
+			hHand.get(i).setY(105);
+			hNumber += rankToInt(hHand.get(i));
+		}
 		hHand.get(0).attachBack();
-		hHand.get(0).setArcWidth(10);
-		hHand.get(0).setArcHeight(10);
-		hHand.get(0).setX(105);
-		hHand.get(0).setY(105);
 		hHand.get(1).toFront();
 		hHand.get(1).attachFace();
-		hHand.get(1).setArcWidth(10);
-		hHand.get(1).setArcHeight(10);
-		hHand.get(1).setX(140);
-		hHand.get(1).setY(105);
 	}
 
 	// This deals the two cards for the player
 	public void PlayerCards() {
-		pHand.add(dc.Cards[49]);
-		pHand.add(dc.Cards[48]);
-		pHand.get(0).setVisible(true);
-		pHand.get(1).setVisible(true);
+		for (int i = 0; i < 2; i++) {
+			pHand.add(dc.Cards[49 - i]);
+			pHand.get(i).setVisible(true);
+			pHand.get(i).setArcWidth(10);
+			pHand.get(i).setArcHeight(10);
+			pHand.get(i).setX(105 + 35 * i);
+			pHand.get(i).setY(405);
+			pNumber += rankToInt(pHand.get(i));
+		}
 		pHand.get(0).attachFace();
-		pHand.get(0).setArcWidth(10);
-		pHand.get(0).setArcHeight(10);
-		pHand.get(0).setX(105);
-		pHand.get(0).setY(405);
 		pHand.get(1).toFront();
 		pHand.get(1).attachFace();
-		pHand.get(1).setArcWidth(10);
-		pHand.get(1).setArcHeight(10);
-		pHand.get(1).setX(140);
-		pHand.get(1).setY(405);
 	}
 
 	// Set button visibility
